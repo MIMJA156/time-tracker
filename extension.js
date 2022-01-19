@@ -8,10 +8,14 @@ const fs = require('fs');
 const global = {};
 
 function activate(context) {
+	vscode.workspace.onDidChangeTextDocument(changeEvent => {
+		let file_path = changeEvent.document.uri.path.split('.');
+		console.log(file_path[file_path.length - 1]);
+	});
+
 	const myCommandId = 'mimjas-time-tracker.timeStatuesItemClicked';
 	context.subscriptions.push(vscode.commands.registerCommand(myCommandId, async () => {}));
 
-	// create a new status bar item and align it to the left.
 	const item = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 1);
 	item.command = myCommandId;
 	context.subscriptions.push(item);
@@ -31,30 +35,20 @@ function activate(context) {
 		newYearOfTimeJson();
 	}
 
-	var hours = `${(global.full[currentTime[0]].months[currentTime[1]][currentTime[2]].total / 60)}`.split('.')[0];
-	var minutes = (global.full[currentTime[0]].months[currentTime[1]][currentTime[2]].total - (hours * 60));
-
-	console.log(hours);
+	var hours = `${(global.full[currentTime[0]].months[currentTime[1]][currentTime[2]].active / 60)}`.split('.')[0];
+	var minutes = (global.full[currentTime[0]].months[currentTime[1]][currentTime[2]].active - (hours * 60));
 
 	item.text = `$(circuit-board) ${timeString(hours, minutes)}`;
 	item.tooltip = `Time Spent Coding on ${getNumberDate()}`;
 	item.show();
 
-	let current_day = currentTime[2];
 	setInterval(() => {
 		const currentTime = getCurrentTime();
-		if (currentTime[2] !== current_day) {
-			current_day = currentTime[2];
-			minutes = 0;
-			hours = 0;
-		}
 
-		if (!global.full[currentTime[0]]) {
-			newYearOfTimeJson();
-		}
+		if (!global.full[currentTime[0]]) newYearOfTimeJson();
 
-		hours = `${(global.full[currentTime[0]].months[currentTime[1]][currentTime[2]].total / 60)}`.split('.')[0];
-		minutes = (global.full[currentTime[0]].months[currentTime[1]][currentTime[2]].total - (hours * 60));
+		hours = `${(global.full[currentTime[0]].months[currentTime[1]][currentTime[2]].active / 60)}`.split('.')[0];
+		minutes = (global.full[currentTime[0]].months[currentTime[1]][currentTime[2]].active - (hours * 60));
 
 		minutes++;
 		if (minutes >= 60) {
@@ -66,7 +60,7 @@ function activate(context) {
 		item.tooltip = `Time Spent Coding on ${getNumberDate()}`;
 		item.show();
 
-		global.full[currentTime[0]].months[currentTime[1]][currentTime[2]].total++;
+		global.full[currentTime[0]].months[currentTime[1]][currentTime[2]].active++;
 		fs.writeFileSync(`${__dirname}/../time-tracker-storage-mimja/time.json`, JSON.stringify(global.full, null, 4));
 	}, 60000);
 }
@@ -111,7 +105,8 @@ function newYearOfTimeJson() {
 	const months = 12;
 	const days = 31;
 	const filler = {
-		total: 0,
+		active: 0,
+		idle: 0,
 		graph: [],
 	};
 

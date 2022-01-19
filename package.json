@@ -1,8 +1,8 @@
 {
   "name": "time-tracker-app",
-  "displayName": "Time Tracker by mimja",
+  "displayName": "Mimjas Time Tracker",
   "description": "Logs the amount of time you spend coding. (This is a Personal Project and not meant to be perfect)",
-  "version": "0.0.8",
+  "version": "0.1.0",
   "publisher": "MIMJA156",
   "repository": {
     "type": "git",
@@ -15,7 +15,8 @@
     "Other"
   ],
   "activationEvents": [
-    "onStartupFinished"
+    "onStartupFinished",
+    "onFileSystem:openFile"
   ],
   "main": "./extension.js",
   "devDependencies": {
