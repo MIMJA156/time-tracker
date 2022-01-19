@@ -8,9 +8,11 @@ const fs = require('fs');
 const global = {};
 
 function activate(context) {
+	resetIdleTimeout(300000);
 	vscode.workspace.onDidChangeTextDocument(changeEvent => {
 		let file_path = changeEvent.document.uri.path.split('.');
-		console.log(file_path[file_path.length - 1]);
+		global.current_file_type = file_path[file_path.length - 1];
+		resetIdleTimeout(300000);
 	});
 
 	const myCommandId = 'mimjas-time-tracker.timeStatuesItemClicked';
@@ -30,7 +32,9 @@ function activate(context) {
 
 	const currentTime = getCurrentTime();
 	try {
-		global.full[currentTime[0]].months;
+		if (global.full[currentTime[0]].months[currentTime[1]][currentTime[2]].active == null) throw new Error();
+		if (global.full[currentTime[0]].months[currentTime[1]][currentTime[2]].idle == null) throw new Error();
+		global.full[currentTime[0]].months[currentTime[1]][currentTime[2]].graph[0];
 	} catch (e) {
 		newYearOfTimeJson();
 	}
@@ -42,27 +46,32 @@ function activate(context) {
 	item.tooltip = `Time Spent Coding on ${getNumberDate()}`;
 	item.show();
 
+	let count = 0;
 	setInterval(() => {
-		const currentTime = getCurrentTime();
+		count++;
+		if (count >= 60 && global.idle != true) {
+			count = 0;
+			const currentTime = getCurrentTime();
 
-		if (!global.full[currentTime[0]]) newYearOfTimeJson();
+			if (!global.full[currentTime[0]]) newYearOfTimeJson();
 
-		hours = `${(global.full[currentTime[0]].months[currentTime[1]][currentTime[2]].active / 60)}`.split('.')[0];
-		minutes = (global.full[currentTime[0]].months[currentTime[1]][currentTime[2]].active - (hours * 60));
+			hours = `${(global.full[currentTime[0]].months[currentTime[1]][currentTime[2]].active / 60)}`.split('.')[0];
+			minutes = (global.full[currentTime[0]].months[currentTime[1]][currentTime[2]].active - (hours * 60));
 
-		minutes++;
-		if (minutes >= 60) {
-			minutes = 0;
-			hours++;
+			minutes++;
+			if (minutes >= 60) {
+				minutes = 0;
+				hours++;
+			}
+
+			item.text = `$(circuit-board) ${timeString(hours, minutes)}`;
+			item.tooltip = `Time Spent Coding on ${getNumberDate()}`;
+			item.show();
+
+			global.full[currentTime[0]].months[currentTime[1]][currentTime[2]].active++;
+			fs.writeFileSync(`${__dirname}/../time-tracker-storage-mimja/time.json`, JSON.stringify(global.full, null, 4));
 		}
-
-		item.text = `$(circuit-board) ${timeString(hours, minutes)}`;
-		item.tooltip = `Time Spent Coding on ${getNumberDate()}`;
-		item.show();
-
-		global.full[currentTime[0]].months[currentTime[1]][currentTime[2]].active++;
-		fs.writeFileSync(`${__dirname}/../time-tracker-storage-mimja/time.json`, JSON.stringify(global.full, null, 4));
-	}, 60000);
+	}, 1000);
 }
 
 // this method is called when your extension is deactivated.
@@ -101,14 +110,50 @@ function timeString(hours, minutes) {
 function newYearOfTimeJson() {
 	const currentTime = getCurrentTime();
 
+	const idle = getIdle();
+
+	function getIdle() {
+		try {
+			let a = global.full[currentTime[0]].months[currentTime[1]][currentTime[2]].idle;
+			if (a == null) throw new Error();
+			return a;
+		} catch (e) {
+			return 0;
+		}
+	}
+
+	const active = getActive();
+
+	function getActive() {
+		try {
+			let a = global.full[currentTime[0]].months[currentTime[1]][currentTime[2]].active;
+			if (a == null) throw new Error();
+			return a;
+		} catch (e) {
+			return 0;
+		}
+	}
+
+	const graph = getGraph();
+
+	function getGraph() {
+		try {
+			return global.full[currentTime[0]].months[currentTime[1]][currentTime[2]].graph;
+		} catch (e) {
+			return [];
+		}
+	}
+
 	const empty = {};
 	const months = 12;
 	const days = 31;
 	const filler = {
-		active: 0,
-		idle: 0,
-		graph: [],
+		active,
+		idle,
+		graph,
 	};
+
+	console.log(filler);
 
 	empty[currentTime[0]] = {
 		"months": {}
@@ -123,4 +168,14 @@ function newYearOfTimeJson() {
 
 	global.full = Object.assign({}, global.full, empty);
 	fs.writeFileSync(`${__dirname}/../time-tracker-storage-mimja/time.json`, JSON.stringify(global.full, null, 4));
+}
+
+var timeout;
+
+function resetIdleTimeout(time) {
+	global.idle = false;
+	clearTimeout(timeout);
+	timeout = setTimeout(() => {
+		global.idle = true;
+	}, time);
 }

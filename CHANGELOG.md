@@ -17,3 +17,8 @@ All Changes made are logged in this file.
 ## 0.0.8
 
 - Fixed a bug where the time was not being displayed correctly
+
+## 0.1.0
+
+- Extension will no longer log idle time
+- Added a fail safe to prevent data loss when updating to new versions
