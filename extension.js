@@ -53,8 +53,8 @@ function activate(context) {
 			newYearOfTimeJson();
 		}
 
-		minutes = `${(global.full[currentTime[0]].months[currentTime[1]][currentTime[2]].total / 60)}`.split('.')[0];
-		hours = (global.full[currentTime[0]].months[currentTime[1]][currentTime[2]].total - minutes * 60);
+		hours = `${(global.full[currentTime[0]].months[currentTime[1]][currentTime[2]].total / 60)}`.split('.')[0];
+		minutes = (global.full[currentTime[0]].months[currentTime[1]][currentTime[2]].total - (hours * 60));
 
 		minutes++;
 		if (minutes >= 60) {
