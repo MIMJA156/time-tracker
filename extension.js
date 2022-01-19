@@ -17,21 +17,58 @@ function activate(context) {
 	context.subscriptions.push(item);
 
 	try {
-		global.full = fs.readFileSync(`${__dirname}/../time-tracker-storage-mimja/time.json`);
+		global.full = JSON.parse(fs.readFileSync(`${__dirname}/../time-tracker-storage-mimja/time.json`));
 	} catch (e) {
 		fs.mkdirSync(`${__dirname}/../time-tracker-storage-mimja/`);
 		fs.writeFileSync(`${__dirname}/../time-tracker-storage-mimja/time.json`, '{}');
+		global.full = {};
 	}
 
+	const currentTime = getCurrentTime();
 	try {
-		global.full[2022].months;
+		global.full[currentTime[0]].months;
 	} catch (e) {
-
+		newYearOfTimeJson();
 	}
 
-	item.text = `$(circuit-board) ${timeString(1, 0)}`;
+	var hours = `${(global.full[currentTime[0]].months[currentTime[1]][currentTime[2]].total / 60)}`.split('.')[0];
+	var minutes = (global.full[currentTime[0]].months[currentTime[1]][currentTime[2]].total - (hours * 60));
+
+	console.log(hours);
+
+	item.text = `$(circuit-board) ${timeString(hours, minutes)}`;
 	item.tooltip = `Time Spent Coding on ${getNumberDate()}`;
 	item.show();
+
+	let current_day = currentTime[2];
+	setInterval(() => {
+		const currentTime = getCurrentTime();
+		if (currentTime[2] !== current_day) {
+			current_day = currentTime[2];
+			minutes = 0;
+			hours = 0;
+		}
+
+		if (!global.full[currentTime[0]]) {
+			newYearOfTimeJson();
+		}
+
+		minutes = `${(global.full[currentTime[0]].months[currentTime[1]][currentTime[2]].total / 60)}`.split('.')[0];
+		hours = (global.full[currentTime[0]].months[currentTime[1]][currentTime[2]].total - minutes * 60);
+
+		minutes++;
+		if (minutes >= 60) {
+			minutes = 0;
+			hours++;
+		}
+
+		item.text = `$(circuit-board) ${timeString(hours, minutes)}`;
+		item.tooltip = `Time Spent Coding on ${getNumberDate()}`;
+		item.show();
+
+		global.full[currentTime[0]].months[currentTime[1]][currentTime[2]].total++;
+		fs.writeFileSync(`${__dirname}/../time-tracker-storage-mimja/time.json`, JSON.stringify(global.full, null, 4));
+	}, 60000);
 }
 
 // this method is called when your extension is deactivated.
@@ -68,5 +105,27 @@ function timeString(hours, minutes) {
 }
 
 function newYearOfTimeJson() {
+	const currentTime = getCurrentTime();
 
+	const empty = {};
+	const months = 12;
+	const days = 31;
+	const filler = {
+		total: 0,
+		graph: [],
+	};
+
+	empty[currentTime[0]] = {
+		"months": {}
+	};
+
+	for (let i_1 = 1; i_1 < months + 1; i_1++) {
+		empty[currentTime[0]].months[i_1] = {};
+		for (let i_2 = 1; i_2 < days + 1; i_2++) {
+			empty[currentTime[0]].months[i_1][i_2] = filler;
+		}
+	}
+
+	global.full = Object.assign({}, global.full, empty);
+	fs.writeFileSync(`${__dirname}/../time-tracker-storage-mimja/time.json`, JSON.stringify(global.full, null, 4));
 }
