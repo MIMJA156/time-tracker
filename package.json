@@ -3,7 +3,11 @@
   "displayName": "Time Tracker by mimja",
   "description": "Logs the amount of time you spend coding. (This is a Personal Project and not meant to be perfect)",
   "version": "0.0.5",
-  "publisher": "mimja",
+  "publisher": "mimja156",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/MIMJA156/time-tracker.git"
+  },
   "engines": {
     "vscode": "^1.63.0"
   },
