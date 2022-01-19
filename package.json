@@ -1,9 +1,9 @@
 {
-  "name": "time-tracker",
+  "name": "time-tracker-app",
   "displayName": "Time Tracker by mimja",
   "description": "Logs the amount of time you spend coding. (This is a Personal Project and not meant to be perfect)",
   "version": "0.0.5",
-  "publisher": "mimja156",
+  "publisher": "MIMJA156",
   "repository": {
     "type": "git",
     "url": "https://github.com/MIMJA156/time-tracker.git"
