@@ -32,11 +32,12 @@ function activate(context) {
 
 	const currentTime = getCurrentTime();
 	try {
-		if (global.full[currentTime[0]].months[currentTime[1]][currentTime[2]].active == null) throw new Error();
-		if (global.full[currentTime[0]].months[currentTime[1]][currentTime[2]].idle == null) throw new Error();
+		if (global.full[currentTime[0]] == null) throw new Error('year');
+		if (global.full[currentTime[0]].months[currentTime[1]][currentTime[2]].active == null) throw new Error('active');
+		if (global.full[currentTime[0]].months[currentTime[1]][currentTime[2]].idle == null) throw new Error('idle');
 		global.full[currentTime[0]].months[currentTime[1]][currentTime[2]].graph[0];
 	} catch (e) {
-		newYearOfTimeJson();
+		updateAllJson(e);
 	}
 
 	var hours = `${(global.full[currentTime[0]].months[currentTime[1]][currentTime[2]].active / 60)}`.split('.')[0];
@@ -110,50 +111,14 @@ function timeString(hours, minutes) {
 function newYearOfTimeJson() {
 	const currentTime = getCurrentTime();
 
-	const idle = getIdle();
-
-	function getIdle() {
-		try {
-			let a = global.full[currentTime[0]].months[currentTime[1]][currentTime[2]].idle;
-			if (a == null) throw new Error();
-			return a;
-		} catch (e) {
-			return 0;
-		}
-	}
-
-	const active = getActive();
-
-	function getActive() {
-		try {
-			let a = global.full[currentTime[0]].months[currentTime[1]][currentTime[2]].active;
-			if (a == null) throw new Error();
-			return a;
-		} catch (e) {
-			return 0;
-		}
-	}
-
-	const graph = getGraph();
-
-	function getGraph() {
-		try {
-			return global.full[currentTime[0]].months[currentTime[1]][currentTime[2]].graph;
-		} catch (e) {
-			return [];
-		}
-	}
-
 	const empty = {};
 	const months = 12;
 	const days = 31;
 	const filler = {
-		active,
-		idle,
-		graph,
+		active: 0,
+		idle: 0,
+		graph: [],
 	};
-
-	console.log(filler);
 
 	empty[currentTime[0]] = {
 		"months": {}
@@ -168,6 +133,10 @@ function newYearOfTimeJson() {
 
 	global.full = Object.assign({}, global.full, empty);
 	fs.writeFileSync(`${__dirname}/../time-tracker-storage-mimja/time.json`, JSON.stringify(global.full, null, 4));
+}
+
+function updateAllJson(error) {
+	console.log(error.message);
 }
 
 var timeout;
