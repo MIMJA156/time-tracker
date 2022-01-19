@@ -5,9 +5,3 @@
 ## Features
 
 This simply will track the amount of time you spend coding per day.
-
-## Release Notes
-
-### 0.0.5
-
-Initial release. (may still have bugs)
