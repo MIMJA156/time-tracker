@@ -71,7 +71,10 @@ function activate(context) {
 
 			global.full[currentTime[0]].months[currentTime[1]][currentTime[2]].active++;
 			fs.writeFileSync(`${__dirname}/../time-tracker-storage-mimja/time.json`, JSON.stringify(global.full, null, 4));
+		} else if (global.idle == true) {
+			count--;
 		}
+		console.log(count);
 	}, 1000);
 }
 
