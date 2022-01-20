@@ -33,9 +33,9 @@ function activate(context) {
 	const currentTime = getCurrentTime();
 	try {
 		if (global.full[currentTime[0]] == null) throw new Error('year');
-		if (global.full[currentTime[0]].months[currentTime[1]][currentTime[2]].active == null) throw new Error('active');
-		if (global.full[currentTime[0]].months[currentTime[1]][currentTime[2]].idle == null) throw new Error('idle');
-		global.full[currentTime[0]].months[currentTime[1]][currentTime[2]].graph[0];
+		if (global.full[currentTime[0]].months[currentTime[1]][currentTime[2]].active == null) throw new Error('missing');
+		if (global.full[currentTime[0]].months[currentTime[1]][currentTime[2]].idle == null) throw new Error('missing');
+		if (global.full[currentTime[0]].months[currentTime[1]][currentTime[2]].graph == null) throw new Error('missing');
 	} catch (e) {
 		updateAllJson(e);
 	}
@@ -136,7 +136,30 @@ function newYearOfTimeJson() {
 }
 
 function updateAllJson(error) {
-	console.log(error.message);
+	if (error.message == 'year') {
+		newYearOfTimeJson();
+	}
+	if (error.message == 'missing') {
+		let empty = {};
+		for (const key_1 in global.full) {
+			empty[key_1] = {
+				"months": {}
+			};
+			for (const key_2 in global.full[key_1].months) {
+				empty[key_1].months[key_2] = {};
+				for (const key_3 in global.full[key_1].months[key_2]) {
+					empty[key_1].months[key_2][key_3] = {
+						active: (global.full[key_1].months[key_2][key_3].active == undefined) ? 0 : global.full[key_1].months[key_2][key_3].active,
+						idle: (global.full[key_1].months[key_2][key_3].idle == undefined) ? 0 : global.full[key_1].months[key_2][key_3].idle,
+						graph: (global.full[key_1].months[key_2][key_3].graph == undefined) ? [] : global.full[key_1].months[key_2][key_3].graph,
+					};
+				}
+			}
+		}
+
+		global.full = Object.assign({}, empty);
+		fs.writeFileSync(`${__dirname}/../time-tracker-storage-mimja/time.json`, JSON.stringify(global.full, null, 4));
+	}
 }
 
 var timeout;
@@ -146,5 +169,6 @@ function resetIdleTimeout(time) {
 	clearTimeout(timeout);
 	timeout = setTimeout(() => {
 		global.idle = true;
+		vscode.window.showInformationMessage('Idle mode has been activated. Time will not be logged until you resume coding.');
 	}, time);
 }
