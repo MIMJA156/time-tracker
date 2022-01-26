@@ -43,14 +43,16 @@ function activate(context) {
 	var hours = `${(global.full[currentTime[0]].months[currentTime[1]][currentTime[2]].active / 60)}`.split('.')[0];
 	var minutes = (global.full[currentTime[0]].months[currentTime[1]][currentTime[2]].active - (hours * 60));
 
-	item.text = `$(circuit-board) ${timeString(hours, minutes)}`;
+	item.text = `$(pass-filled) ${timeString(hours, minutes)}`;
 	item.tooltip = `Time Spent Coding on ${getNumberDate()}`;
 	item.show();
 
 	let count = 0;
+	let tillGraph = 0;
 	setInterval(() => {
 		count++;
 		if (count >= 60 && global.idle != true) {
+			tillGraph++;
 			count = 0;
 			const currentTime = getCurrentTime();
 
@@ -65,16 +67,25 @@ function activate(context) {
 				hours++;
 			}
 
-			item.text = `$(circuit-board) ${timeString(hours, minutes)}`;
+			item.text = `$(pass-filled) ${timeString(hours, minutes)}`;
 			item.tooltip = `Time Spent Coding on ${getNumberDate()}`;
 			item.show();
 
 			global.full[currentTime[0]].months[currentTime[1]][currentTime[2]].active++;
+			if (tillGraph >= 15) {
+				global.full[currentTime[0]].months[currentTime[1]][currentTime[2]].graph.push({
+					time: {
+						hours: currentTime[3],
+						minutes: currentTime[4]
+					},
+					data: global.full[currentTime[0]].months[currentTime[1]][currentTime[2]].active
+				});
+				tillGraph = 0;
+			}
 			fs.writeFileSync(`${__dirname}/../time-tracker-storage-mimja/time.json`, JSON.stringify(global.full, null, 4));
 		} else if (global.idle == true) {
 			count--;
 		}
-		console.log(count);
 	}, 1000);
 }
 
@@ -96,7 +107,10 @@ function getCurrentTime() {
 	const yyyy = today.getFullYear();
 	const mm = today.getMonth() + 1;
 	const dd = today.getDate();
-	return [yyyy, mm, dd];
+	const hh = today.getHours();
+	const min = today.getMinutes();
+	const sec = today.getSeconds();
+	return [yyyy, mm, dd, hh, min, sec];
 }
 
 function timeString(hours, minutes) {
