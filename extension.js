@@ -34,7 +34,6 @@ function activate(context) {
 	try {
 		if (global.full[currentTime[0]] == null) throw new Error('year');
 		if (global.full[currentTime[0]].months[currentTime[1]][currentTime[2]].active == null) throw new Error('missing');
-		if (global.full[currentTime[0]].months[currentTime[1]][currentTime[2]].idle == null) throw new Error('missing');
 		if (global.full[currentTime[0]].months[currentTime[1]][currentTime[2]].graph == null) throw new Error('missing');
 	} catch (e) {
 		updateAllJson(e);
@@ -74,7 +73,6 @@ function activate(context) {
 		} else if (global.idle == true) {
 			count--;
 		}
-		console.log(count);
 	}, 1000);
 }
 
@@ -119,7 +117,6 @@ function newYearOfTimeJson() {
 	const days = 31;
 	const filler = {
 		active: 0,
-		idle: 0,
 		graph: [],
 	};
 
@@ -153,7 +150,6 @@ function updateAllJson(error) {
 				for (const key_3 in global.full[key_1].months[key_2]) {
 					empty[key_1].months[key_2][key_3] = {
 						active: (global.full[key_1].months[key_2][key_3].active == undefined) ? 0 : global.full[key_1].months[key_2][key_3].active,
-						idle: (global.full[key_1].months[key_2][key_3].idle == undefined) ? 0 : global.full[key_1].months[key_2][key_3].idle,
 						graph: (global.full[key_1].months[key_2][key_3].graph == undefined) ? [] : global.full[key_1].months[key_2][key_3].graph,
 					};
 				}
