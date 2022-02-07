@@ -9,14 +9,59 @@ const global = {};
 
 function activate(context) {
 	resetIdleTimeout(300000);
-	vscode.workspace.onDidChangeTextDocument(changeEvent => {
-		let file_path = changeEvent.document.uri.path.split('.');
-		global.current_file_type = file_path[file_path.length - 1];
-		resetIdleTimeout(300000);
+	vscode.workspace.onDidChangeTextDocument(changeEvent => unIdle(changeEvent));
+	vscode.workspace.onDidCreateFiles(createEvent => unIdle(createEvent));
+	vscode.workspace.onDidDeleteFiles(deleteEvent => unIdle(deleteEvent));
+	vscode.workspace.onDidRenameFiles(renameEvent => unIdle(renameEvent));
+	vscode.window.onDidOpenTerminal(terminal => unIdle(terminal));
+	vscode.window.onDidCloseTerminal(terminal => unIdle(terminal));
+
+	vscode.window.onDidChangeWindowState(state => {
+		console.log(state);
+		if (state.focused) {
+			resetIdleTimeout(300000);
+		} else {
+			global.idle = true;
+		}
 	});
 
+	function unIdle(e) {
+		try {
+			let file_path = e.document.uri.path.split('.');
+			global.current_file_type = file_path[file_path.length - 1];
+		} catch (e) {
+			global.current_file_type = 'unknown';
+		}
+		resetIdleTimeout(300000);
+		console.log(global.current_file_type);
+	}
+
 	const myCommandId = 'mimjas-time-tracker.timeStatuesItemClicked';
-	context.subscriptions.push(vscode.commands.registerCommand(myCommandId, async () => {}));
+	context.subscriptions.push(vscode.commands.registerCommand(myCommandId, async () => {
+		// Create and show panel
+		const panel = vscode.window.createWebviewPanel(
+			'catCoding',
+			'Cat Coding',
+			vscode.ViewColumn.One, {}
+		);
+
+		// And set its HTML content
+		panel.webview.html = getWebviewContent();
+	}));
+
+	function getWebviewContent() {
+		return `<!DOCTYPE html>
+	  <html lang="en">
+	  <head>
+		  <meta charset="UTF-8">
+		  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+		  <title>Cat Coding</title>
+	  </head>
+	  <body>
+		  <img src="https://media.giphy.com/media/JIX9t2j0ZTN9S/giphy.gif" width="300" />
+	  </body>
+	  </html>`;
+	}
 
 	const item = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 1);
 	item.command = myCommandId;
