@@ -17,11 +17,8 @@ function activate(context) {
 	vscode.window.onDidCloseTerminal(terminal => unIdle(terminal));
 
 	vscode.window.onDidChangeWindowState(state => {
-		console.log(state);
 		if (state.focused) {
 			resetIdleTimeout(300000);
-		} else {
-			global.idle = true;
 		}
 	});
 
@@ -33,7 +30,6 @@ function activate(context) {
 			global.current_file_type = 'unknown';
 		}
 		resetIdleTimeout(300000);
-		console.log(global.current_file_type);
 	}
 
 	const myCommandId = 'mimjas-time-tracker.timeStatuesItemClicked';
