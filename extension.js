@@ -8,6 +8,15 @@ const fs = require('fs');
 const global = {};
 
 function activate(context) {
+	var icon = vscode.workspace.getConfiguration().get('Icon Style');
+	icon = `$(${icon})`;
+
+	vscode.workspace.onDidChangeConfiguration(() => {
+		icon = vscode.workspace.getConfiguration().get('Icon Style');
+		icon = `$(${icon})`;
+		item.text = `${icon} ${timeString(hours, minutes)}`;
+	})
+
 	resetIdleTimeout(300000);
 	vscode.workspace.onDidChangeTextDocument(changeEvent => unIdle(changeEvent));
 	vscode.workspace.onDidCreateFiles(createEvent => unIdle(createEvent));
@@ -15,12 +24,7 @@ function activate(context) {
 	vscode.workspace.onDidRenameFiles(renameEvent => unIdle(renameEvent));
 	vscode.window.onDidOpenTerminal(terminal => unIdle(terminal));
 	vscode.window.onDidCloseTerminal(terminal => unIdle(terminal));
-
-	vscode.window.onDidChangeWindowState(state => {
-		if (state.focused) {
-			resetIdleTimeout(300000);
-		}
-	});
+	vscode.window.onDidChangeWindowState(state => unIdle(state));
 
 	function unIdle(e) {
 		try {
@@ -84,7 +88,7 @@ function activate(context) {
 	var hours = `${(global.full[currentTime[0]].months[currentTime[1]][currentTime[2]].active / 60)}`.split('.')[0];
 	var minutes = (global.full[currentTime[0]].months[currentTime[1]][currentTime[2]].active - (hours * 60));
 
-	item.text = `$(pass-filled) ${timeString(hours, minutes)}`;
+	item.text = `${icon} ${timeString(hours, minutes)}`;
 	item.tooltip = `Time Spent Coding on ${getNumberDate()}`;
 	item.show();
 
@@ -108,7 +112,7 @@ function activate(context) {
 				hours++;
 			}
 
-			item.text = `$(pass-filled) ${timeString(hours, minutes)}`;
+			item.text = `${icon} ${timeString(hours, minutes)}`;
 			item.tooltip = `Time Spent Coding on ${getNumberDate()}`;
 			item.show();
 

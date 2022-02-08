@@ -31,3 +31,8 @@ All Changes made are logged in this file.
 
 - Improved the idle time detection
 - Added a slightly hidden meme
+
+## 0.2.1
+
+- Added customizable time icon in the settings
+- Super small bug fixe
