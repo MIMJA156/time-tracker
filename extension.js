@@ -10,9 +10,17 @@ const global = {};
 function activate(context) {
 	var icon = vscode.workspace.getConfiguration().get('Icon Style');
 	icon = `$(${icon})`;
+	if (icon == '') {
+		icon = '$(circuit-board)';
+		vscode.workspace.getConfiguration().update('Icon Style', 'circuit-board', vscode.ConfigurationTarget.Global);
+	}
 
 	vscode.workspace.onDidChangeConfiguration(() => {
 		icon = vscode.workspace.getConfiguration().get('Icon Style');
+		if (icon == '') {
+			icon = '$(circuit-board)';
+			vscode.workspace.getConfiguration().update('Icon Style', 'circuit-board', vscode.ConfigurationTarget.Global);
+		}
 		icon = `$(${icon})`;
 		item.text = `${icon} ${timeString(hours, minutes)}`;
 	})
@@ -55,10 +63,10 @@ function activate(context) {
 	  <head>
 		  <meta charset="UTF-8">
 		  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-		  <title>Cat Coding</title>
+		  <title>Cat Coding - Image</title>
 	  </head>
 	  <body>
-		  <img src="https://media.giphy.com/media/JIX9t2j0ZTN9S/giphy.gif" width="300" />
+		  <img src="https://media.giphy.com/media/JIX9t2j0ZTN9S/giphy.gif" width="500" />
 	  </body>
 	  </html>`;
 	}

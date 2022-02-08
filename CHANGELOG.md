@@ -36,3 +36,8 @@ All Changes made are logged in this file.
 
 - Added customizable time icon in the settings
 - Super small bug fixe
+
+## 0.2.2
+
+- Added a icon fall back
+- Made meme image bigger
