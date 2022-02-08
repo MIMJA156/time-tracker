@@ -26,3 +26,8 @@ All Changes made are logged in this file.
 ## 0.1.1
 
 - Fixed a bug where the idle time would add an extra minute to the total time
+
+## 0.2.0
+
+- Improved the idle time detection
+- Added a slightly hidden meme
