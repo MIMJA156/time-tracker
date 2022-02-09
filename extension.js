@@ -8,15 +8,68 @@ const fs = require('fs');
 const global = {};
 
 function activate(context) {
+	var icon = vscode.workspace.getConfiguration().get('Icon Style');
+	icon = `$(${icon})`;
+	if (icon == '') {
+		icon = '$(circuit-board)';
+		vscode.workspace.getConfiguration().update('Icon Style', 'circuit-board', vscode.ConfigurationTarget.Global);
+	}
+
+	vscode.workspace.onDidChangeConfiguration(() => {
+		icon = vscode.workspace.getConfiguration().get('Icon Style');
+		if (icon == '') {
+			icon = '$(circuit-board)';
+			vscode.workspace.getConfiguration().update('Icon Style', 'circuit-board', vscode.ConfigurationTarget.Global);
+		}
+		icon = `$(${icon})`;
+		item.text = `${icon} ${timeString(hours, minutes)}`;
+	})
+
 	resetIdleTimeout(300000);
-	vscode.workspace.onDidChangeTextDocument(changeEvent => {
-		let file_path = changeEvent.document.uri.path.split('.');
-		global.current_file_type = file_path[file_path.length - 1];
+	vscode.workspace.onDidChangeTextDocument(changeEvent => unIdle(changeEvent));
+	vscode.workspace.onDidCreateFiles(createEvent => unIdle(createEvent));
+	vscode.workspace.onDidDeleteFiles(deleteEvent => unIdle(deleteEvent));
+	vscode.workspace.onDidRenameFiles(renameEvent => unIdle(renameEvent));
+	vscode.window.onDidOpenTerminal(terminal => unIdle(terminal));
+	vscode.window.onDidCloseTerminal(terminal => unIdle(terminal));
+	vscode.window.onDidChangeWindowState(state => unIdle(state));
+
+	function unIdle(e) {
+		try {
+			let file_path = e.document.uri.path.split('.');
+			global.current_file_type = file_path[file_path.length - 1];
+		} catch (e) {
+			global.current_file_type = 'unknown';
+		}
 		resetIdleTimeout(300000);
-	});
+	}
 
 	const myCommandId = 'mimjas-time-tracker.timeStatuesItemClicked';
-	context.subscriptions.push(vscode.commands.registerCommand(myCommandId, async () => {}));
+	context.subscriptions.push(vscode.commands.registerCommand(myCommandId, async () => {
+		// Create and show panel
+		const panel = vscode.window.createWebviewPanel(
+			'catCoding',
+			'Cat Coding',
+			vscode.ViewColumn.One, {}
+		);
+
+		// And set its HTML content
+		panel.webview.html = getWebviewContent();
+	}));
+
+	function getWebviewContent() {
+		return `<!DOCTYPE html>
+	  <html lang="en">
+	  <head>
+		  <meta charset="UTF-8">
+		  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+		  <title>Cat Coding - Image</title>
+	  </head>
+	  <body>
+		  <img src="https://media.giphy.com/media/JIX9t2j0ZTN9S/giphy.gif" width="500" />
+	  </body>
+	  </html>`;
+	}
 
 	const item = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 1);
 	item.command = myCommandId;
@@ -42,14 +95,16 @@ function activate(context) {
 	var hours = `${(global.full[currentTime[0]].months[currentTime[1]][currentTime[2]].active / 60)}`.split('.')[0];
 	var minutes = (global.full[currentTime[0]].months[currentTime[1]][currentTime[2]].active - (hours * 60));
 
-	item.text = `$(circuit-board) ${timeString(hours, minutes)}`;
+	item.text = `${icon} ${timeString(hours, minutes)}`;
 	item.tooltip = `Time Spent Coding on ${getNumberDate()}`;
 	item.show();
 
 	let count = 0;
+	let tillGraph = 0;
 	setInterval(() => {
 		count++;
 		if (count >= 60 && global.idle != true) {
+			tillGraph++;
 			count = 0;
 			const currentTime = getCurrentTime();
 
@@ -64,11 +119,21 @@ function activate(context) {
 				hours++;
 			}
 
-			item.text = `$(circuit-board) ${timeString(hours, minutes)}`;
+			item.text = `${icon} ${timeString(hours, minutes)}`;
 			item.tooltip = `Time Spent Coding on ${getNumberDate()}`;
 			item.show();
 
 			global.full[currentTime[0]].months[currentTime[1]][currentTime[2]].active++;
+			if (tillGraph >= 15) {
+				global.full[currentTime[0]].months[currentTime[1]][currentTime[2]].graph.push({
+					time: {
+						hours: currentTime[3],
+						minutes: currentTime[4]
+					},
+					data: global.full[currentTime[0]].months[currentTime[1]][currentTime[2]].active
+				});
+				tillGraph = 0;
+			}
 			fs.writeFileSync(`${__dirname}/../time-tracker-storage-mimja/time.json`, JSON.stringify(global.full, null, 4));
 		} else if (global.idle == true) {
 			count--;
@@ -94,7 +159,10 @@ function getCurrentTime() {
 	const yyyy = today.getFullYear();
 	const mm = today.getMonth() + 1;
 	const dd = today.getDate();
-	return [yyyy, mm, dd];
+	const hh = today.getHours();
+	const min = today.getMinutes();
+	const sec = today.getSeconds();
+	return [yyyy, mm, dd, hh, min, sec];
 }
 
 function timeString(hours, minutes) {
