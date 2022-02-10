@@ -53,7 +53,11 @@ function activate(context) {
     initiateCounting();
 }
 
+/**
+ * This function gets the currently saved information and passes it into `global.time`.
+ */
 function initializeTimeValues() {
+    global.json = {};
     global.currentTime = getCurrentTime();
     let savedTimeJson;
 
@@ -66,17 +70,21 @@ function initializeTimeValues() {
 
     if (!savedTimeJson[global.currentTime[0]]) {
         // code for when the year is not in the json file or the json file is empty.
+        global.json = defineNewPeriodOfJson();
     }
 }
 
 
 /**
- * @returns {object}
+ * @returns {object} An object containing the coding time saved.
  */
-function defineNewJson() {
+function defineNewPeriodOfJson() {
 
 }
 
+/**
+ * This function begins the counting process and begins logging active coding time.
+ */
 function initiateCounting() {
     clearInterval(global.importantInterval);
     global.importantInterval = setInterval(() => {
@@ -84,6 +92,9 @@ function initiateCounting() {
     }, 1000)
 }
 
+/**
+ * This function updates all the global variables to the current settings.
+ */
 function defineCurrentSettings() {
     global.iconString = vscode.workspace.getConfiguration().get('Icon Style');
     if (global.iconString == '') {
@@ -114,7 +125,8 @@ function defineCurrentSettings() {
 }
 
 /**
- * @returns {[year, month, day, hour, minute, sec]} An array of time values.
+ * This functions returns an array containing information about the current local time.
+ * @returns {[year, month, day, hour, minute, sec]}
  */
 
 function getCurrentTime() {
