@@ -4,15 +4,57 @@ const fs = require('fs');
 const global = {};
 const cache = {};
 
+var count = 0;
+var a = false;
+
 global.minutesInADay = 1440;
+global.timeTillIdle = 5 * 60 * 1000;
+global.json = {};
+
+/**
+ * This functions returns an array containing information about the current local time.
+ * @returns {[year, month, day, hour, minute, sec]}
+ */
+global.currentTime = () => {
+    const today = new Date();
+    const yyyy = today.getFullYear();
+    const mm = today.getMonth() + 1;
+    const dd = today.getDate();
+    const hh = today.getHours();
+    const min = today.getMinutes();
+    const sec = today.getSeconds();
+
+
+    //MARK: This is a hack to fix the time.
+    var newHours = hh;
+    var newMinutes = min;
+    let newDays = dd;
+    let enabled = false;
+
+    if (enabled) {
+        if (sec !== 0) {
+            newHours = hh + (24 - hh) - 1;
+            newMinutes = min + (60 - min) - 1;
+            a = true;
+        } else if (sec === 0 && a) {
+            newHours = 24;
+            newMinutes = 0;
+            count++;
+            a = false;
+        }
+    }
+
+    // newDays = dd + count;
+    /*ending hack*/
+
+    return [yyyy, mm, newDays, newHours, newMinutes, sec];
+}
 
 /**
  * @param {vscode.ExtensionContext} context
  */
 
 function activate(context) {
-    global.currentTime = getCurrentTime();
-
     //Get the current settings
     defineCurrentSettings();
     cache.labelPosition = global.labelPosition;
@@ -45,7 +87,7 @@ function activate(context) {
     context.subscriptions.push(global.item);
 
     global.item.text = `${global.iconString}`;
-    global.item.tooltip = `Time Spent Coding on ${`${global.currentTime[1]}/${global.currentTime[2]}/${global.currentTime[0]}`}`;
+    global.item.tooltip = `Time Spent Coding on ${`${global.currentTime()[1]}/${global.currentTime()[2]}/${global.currentTime()[0]}`}`;
     global.item.show();
 
     // Initialize the time counting
@@ -54,32 +96,22 @@ function activate(context) {
 }
 
 /**
- * This function gets the currently saved information and passes it into `global.time`.
+ * This function gets the currently saved information and passes it into `global.time`
  */
 function initializeTimeValues() {
-    global.json = {};
-    global.currentTime = getCurrentTime();
     let savedTimeJson;
 
     try {
         savedTimeJson = fs.readFileSync(`${__dirname}/../time-tracker-storage-mimja/time.json`, 'utf8');
     } catch (e) {
+        try {
+            fs.mkdirSync(`${__dirname}/../time-tracker-storage-mimja/`);
+        } catch (e) {};
         fs.writeFileSync(`${__dirname}/../time-tracker-storage-mimja/time.json`, '{}');
         savedTimeJson = fs.readFileSync(`${__dirname}/../time-tracker-storage-mimja/time.json`, 'utf8');
     }
 
-    if (!savedTimeJson[global.currentTime[0]]) {
-        // code for when the year is not in the json file or the json file is empty.
-        global.json = defineNewPeriodOfJson();
-    }
-}
-
-
-/**
- * @returns {object} An object containing the coding time saved.
- */
-function defineNewPeriodOfJson() {
-
+    global.json = checkJson(savedTimeJson);
 }
 
 /**
@@ -88,8 +120,52 @@ function defineNewPeriodOfJson() {
 function initiateCounting() {
     clearInterval(global.importantInterval);
     global.importantInterval = setInterval(() => {
-
+        global.json = checkJson(global.json);
     }, 1000)
+}
+
+const key = {};
+/**
+ * This function runs a series of checks on the current json and fixes any thing it finds.
+ */
+function checkJson(json) {
+    if (typeof json == 'string') json = JSON.parse(json);
+
+    let hasChanged = false;
+    let checkedJson = json;
+    let previous = null;
+
+    if (json[global.currentTime()[0]] == undefined) {
+        checkedJson[global.currentTime()[0]] = {};
+        hasChanged = true;
+    }
+
+    previous = json[global.currentTime()[0]];
+
+    if (previous[global.currentTime()[1]] == undefined) {
+        checkedJson[global.currentTime()[0]][global.currentTime()[1]] = {};
+        hasChanged = true;
+    }
+
+    previous = json[global.currentTime()[0]][global.currentTime()[1]];
+
+    if (previous[global.currentTime()[2]] == undefined) {
+        checkedJson[global.currentTime()[0]][global.currentTime()[1]][global.currentTime()[2]] = {};
+        hasChanged = true;
+    }
+
+    previous = json[global.currentTime()[0]][global.currentTime()[1]][global.currentTime()[2]];
+
+    if (previous.active == undefined) {
+        checkedJson[global.currentTime()[0]][global.currentTime()[1]][global.currentTime()[2]].active = 0;
+        hasChanged = true;
+    }
+
+    if (hasChanged) {
+        fs.writeFileSync(`${__dirname}/../time-tracker-storage-mimja/time.json`, JSON.stringify(checkedJson), null, 4);
+    }
+
+    return checkedJson;
 }
 
 /**
@@ -101,6 +177,7 @@ function defineCurrentSettings() {
         global.iconString = '$(circuit-board)';
         vscode.workspace.getConfiguration().update('Icon Style', 'circuit-board', vscode.ConfigurationTarget.Global);
     }
+
     global.iconString = `$(${global.iconString})`;
 
     if (vscode.workspace.getConfiguration().get('Label Position') == 'Left') {
@@ -122,22 +199,6 @@ function defineCurrentSettings() {
             global.labelPriority = Infinity;
         }
     }
-}
-
-/**
- * This functions returns an array containing information about the current local time.
- * @returns {[year, month, day, hour, minute, sec]}
- */
-
-function getCurrentTime() {
-    const today = new Date();
-    const yyyy = today.getFullYear();
-    const mm = today.getMonth() + 1;
-    const dd = today.getDate();
-    const hh = today.getHours();
-    const min = today.getMinutes();
-    const sec = today.getSeconds();
-    return [yyyy, mm, dd, hh, min, sec];
 }
 
 function deactivate() {}
