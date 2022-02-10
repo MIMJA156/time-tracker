@@ -46,7 +46,21 @@
             "default": "circuit-board",
 						"description": "Type in the default codicon ID for the icon you want.\nList of icons -> https://code.visualstudio.com/api/references/icons-in-labels#icon-listing",
 						"scope": "application"
-					}
+					},
+          "Label Position": {
+            "type": "string",
+            "enum": [
+              "Left",
+              "Right"
+            ],
+            "default": "Left",
+            "description": "Defines the position on the time label."
+          },
+          "Label Priority":{
+						"type": "boolean",
+						"default": "false",
+						"description": "Is high priority"
+          }
         }
 			}
 		]
