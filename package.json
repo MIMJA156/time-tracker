@@ -2,7 +2,7 @@
   "name": "time-tracker-app",
   "displayName": "Mimjas Time Tracker",
   "description": "Logs the amount of time you spend coding.",
-  "version": "0.2.2",
+  "version": "0.3.0",
   "publisher": "MIMJA156",
   "repository": {
     "type": "git",
