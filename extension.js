@@ -4,7 +4,7 @@ const fs = require('fs');
 const global = {};
 const cache = {};
 
-var count = 0;
+let count = 0;
 var a = false;
 
 global.minutesInADay = 1440;
@@ -124,6 +124,10 @@ function initiateCounting() {
 	clearInterval(global.importantInterval);
 	global.importantInterval = setInterval(() => {
 		global.json = checkJson(global.json);
+		global.json[global.currentTime()[0]][global.currentTime()[1]][global.currentTime()[2]].active++;
+		if (global.json[global.currentTime()[0]][global.currentTime()[1]][global.currentTime()[2]].active % 60 == 0) {
+			fs.writeFileSync(`${__dirname}/../${global.fileDir}/${global.fileName}.json`, JSON.stringify(global.json));
+		}
 	}, 1000)
 }
 
