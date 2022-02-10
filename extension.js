@@ -11,6 +11,9 @@ global.minutesInADay = 1440;
 global.timeTillIdle = 5 * 60 * 1000;
 global.json = {};
 
+global.fileDir = "time-tracker-storage-mimja";
+global.fileName = "time";
+
 /**
  * This functions returns an array containing information about the current local time.
  * @returns {[year, month, day, hour, minute, sec]}
@@ -102,13 +105,13 @@ function initializeTimeValues() {
     let savedTimeJson;
 
     try {
-        savedTimeJson = fs.readFileSync(`${__dirname}/../time-tracker-storage-mimja/time.json`, 'utf8');
+        savedTimeJson = fs.readFileSync(`${__dirname}/../${global.fileDir}/time.json`, 'utf8');
     } catch (e) {
         try {
-            fs.mkdirSync(`${__dirname}/../time-tracker-storage-mimja/`);
+            fs.mkdirSync(`${__dirname}/../${global.fileDir}/`);
         } catch (e) {};
-        fs.writeFileSync(`${__dirname}/../time-tracker-storage-mimja/time.json`, '{}');
-        savedTimeJson = fs.readFileSync(`${__dirname}/../time-tracker-storage-mimja/time.json`, 'utf8');
+        fs.writeFileSync(`${__dirname}/../${global.fileDir}/time.json`, '{}');
+        savedTimeJson = fs.readFileSync(`${__dirname}/../${global.fileDir}/time.json`, 'utf8');
     }
 
     global.json = checkJson(savedTimeJson);
@@ -162,7 +165,7 @@ function checkJson(json) {
     }
 
     if (hasChanged) {
-        fs.writeFileSync(`${__dirname}/../time-tracker-storage-mimja/time.json`, JSON.stringify(checkedJson), null, 4);
+        fs.writeFileSync(`${__dirname}/../${global.fileDir}/time.json`, JSON.stringify(checkedJson), null, 4);
     }
 
     return checkedJson;
