@@ -41,3 +41,7 @@ All Changes made are logged in this file.
 
 - Added a icon fall back
 - Made meme image bigger
+
+## 0.3.0
+
+- Re-did all the code to make it more efficient
