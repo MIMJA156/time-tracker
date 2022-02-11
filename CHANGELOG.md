@@ -53,3 +53,7 @@ All Changes made are logged in this file.
 ## 0.3.3
 
 - Fixed a bug where the time would be displayed as a decimal after custom icon was set
+
+## 0.3.4
+
+-  Fixed a bug where you would loose time when closing the editor at a certain time

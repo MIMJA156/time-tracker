@@ -258,7 +258,9 @@ function parse(filepath) {
 	return filepath.substring(filepath.lastIndexOf('.') + 1, filepath.length);
 }
 
-function deactivate() {}
+function deactivate() {
+	fs.writeFileSync(`${__dirname}/../${global.fileDir}/${global.fileName}.json`, JSON.stringify(global.json));
+}
 
 module.exports = {
 	activate,
