@@ -12,9 +12,6 @@ global.fileDir = "time-tracker-storage-mimja";
 global.fileName = "time.mim";
 global.idleTimeout = null;
 
-let count = 0;
-var a = false;
-
 /**
  * This functions returns an array containing information about the current local time.
  * @returns {[year, month, day, hour, minute, sec, today]}
@@ -28,29 +25,7 @@ global.currentTime = () => {
 	const min = today.getMinutes();
 	const sec = today.getSeconds();
 
-
-	//MARK: This is a hack to fix the time.
-	var newHours = hh;
-	var newMinutes = min;
-	let newDays = dd;
-	let enabled = false;
-
-	// if (enabled) {
-	// 	if (sec !== 0) {
-	// 		newHours = hh + (24 - hh) - 1;
-	// 		newMinutes = min + (60 - min) - 2;
-	// 		a = true;
-	// 	} else if (sec === 0 && a) {
-	// 		newHours = 24;
-	// 		newMinutes = 0;
-	// 		count++;
-	// 		a = false;
-	// 	}
-	// }
-	// newDays = dd + count;
-	/*ending hack*/
-
-	return [yyyy, mm, newDays, newHours, newMinutes, sec, today];
+	return [yyyy, mm, dd, hh, min, sec, today];
 }
 
 /**
@@ -90,7 +65,7 @@ function activate(context) {
 	global.item.show();
 
 	//Listen for command input
-	context.subscriptions.push(vscode.commands.registerCommand('mimjas-time-tracker.timeStatuesItemClicked', async () => {}));
+	context.subscriptions.push(vscode.commands.registerCommand('mimjas-time-tracker.timeStatuesItemClicked', async () => barItemPressed()));
 
 	// Initialize the time counting
 	initializeTimeValues();
@@ -253,6 +228,28 @@ function unIdle() {
 		global.isIdle = true;
 		vscode.window.showInformationMessage('Idle mode has been activated. Time will not be logged until you resume coding.');
 	}, global.timeTillIdle);
+}
+
+function barItemPressed() {
+	// Create and show panel
+	const panel = vscode.window.createWebviewPanel(
+		'catCoding',
+		'Cat Coding',
+		vscode.ViewColumn.One, {}
+	);
+
+	// And set its HTML content
+	panel.webview.html = `<!DOCTYPE html>
+	<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>Cat Coding - Image</title>
+	</head>
+	<body>
+		<img src="https://media.giphy.com/media/JIX9t2j0ZTN9S/giphy.gif" width="600" />
+	</body>
+	</html>`;
 }
 
 /**
