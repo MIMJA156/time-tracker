@@ -49,3 +49,7 @@ All Changes made are logged in this file.
 ## 0.3.2
 
 - Fixed a bug where the time would not be displayed after custom icon was set
+
+## 0.3.3
+
+- Fixed a bug where the time would be displayed as a decimal after custom icon was set

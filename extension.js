@@ -87,7 +87,7 @@ function updateBarItem() {
 	let seconds = global.json[global.currentTime()[0]][global.currentTime()[1]][global.currentTime()[2]].active;
 
 	let hours = `${(seconds / 60) / 60}`.split('.')[0];
-	let minutes = ((seconds / 60) - (hours * 60));
+	let minutes = `${((seconds / 60) - (hours * 60))}`.split('.')[0];
 
 	let h_s = `${hours} hr`;
 	let m_s = `${minutes} min`;
@@ -127,8 +127,6 @@ function initiateCounting() {
 	clearInterval(global.importantInterval);
 	global.importantInterval = setInterval(() => {
 		if (global.isIdle) return;
-		console.log("cool");
-		global.tillMinutesRollover++;
 		global.json = checkJson(global.json);
 		global.json[global.currentTime()[0]][global.currentTime()[1]][global.currentTime()[2]].active++;
 		if (global.json[global.currentTime()[0]][global.currentTime()[1]][global.currentTime()[2]].active % 60 == 0) {
