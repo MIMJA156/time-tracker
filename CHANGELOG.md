@@ -45,3 +45,7 @@ All Changes made are logged in this file.
 ## 0.3.0
 
 - Re-did all the code to make it more efficient
+
+## 0.3.2
+
+- Fixed a bug where the time would not be displayed after custom icon was set

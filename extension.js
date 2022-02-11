@@ -50,7 +50,7 @@ function activate(context) {
 		}
 
 		if (global.iconString !== cache.iconString) {
-			global.item.text = `${global.iconString}`;
+			updateBarItem();
 		}
 
 		cache.labelPosition = global.labelPosition;
