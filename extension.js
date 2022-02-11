@@ -1,5 +1,9 @@
 const vscode = require('vscode');
 const fs = require('fs');
+const open = require('open');
+const {
+	bootServer
+} = require('./server');
 
 const global = {};
 const cache = {};
@@ -24,7 +28,6 @@ global.currentTime = () => {
 	const hh = today.getHours();
 	const min = today.getMinutes();
 	const sec = today.getSeconds();
-
 	return [yyyy, mm, dd, hh, min, sec, today];
 }
 
@@ -71,7 +74,7 @@ function activate(context) {
 	initializeTimeValues();
 	updateBarItem();
 	initiateCounting();
-	unIdle();
+	unIdle(69);
 
 	// Listen for un-idle events
 	vscode.workspace.onDidChangeTextDocument(changeEvent => unIdle(changeEvent));
@@ -218,8 +221,9 @@ function defineCurrentSettings() {
 	}
 }
 
-function unIdle() {
+function unIdle(event) {
 	if (global.isIdle) global.isIdle = false;
+	if (!event.focused) return;
 
 	clearTimeout(global.idleTimeout);
 	global.idleTimeout = setTimeout(() => {
@@ -228,26 +232,8 @@ function unIdle() {
 	}, global.timeTillIdle);
 }
 
-function barItemPressed() {
-	// Create and show panel
-	const panel = vscode.window.createWebviewPanel(
-		'catCoding',
-		'Cat Coding',
-		vscode.ViewColumn.One, {}
-	);
-
-	// And set its HTML content
-	panel.webview.html = `<!DOCTYPE html>
-	<html lang="en">
-	<head>
-		<meta charset="UTF-8">
-		<meta name="viewport" content="width=device-width, initial-scale=1.0">
-		<title>Cat Coding - Image</title>
-	</head>
-	<body>
-		<img src="https://media.giphy.com/media/JIX9t2j0ZTN9S/giphy.gif" width="600" />
-	</body>
-	</html>`;
+async function barItemPressed() {
+	await open('http://localhos:1892');
 }
 
 /**
