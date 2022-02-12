@@ -2,13 +2,24 @@
 <html lang="en">
 
 <head>
-    <script src="./chart.min.js"></script>
+    <script src="./dependances/chart.js"></script>
+    <script src="./dependances/jquery-3.6.0.js"></script>
 </head>
 
 <body>
     <canvas id="chart" width="800px" height="400px"></canvas>
 </body>
 <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const port = urlParams.get('port');
+
+    $.ajax({
+        url: `http://localhost:${port}`,
+        type: `POST`
+    }).done((data) => {
+        console.log(data);
+    });
+
     const chart = document.getElementById('chart');
 
     let barChart = new Chart(chart, {

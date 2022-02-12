@@ -231,7 +231,8 @@ function unIdle(event) {
 }
 
 async function barItemPressed() {
-	await open(`http://localhost:${bootServer()}`);
+	let port = bootServer();
+	await open(`http://localhost:${port}?port=${port}`);
 }
 
 /**

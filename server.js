@@ -5,6 +5,11 @@ function bootServer() {
     let app = express();
 
     app.use(express.static(`${__dirname}/public/`));
+
+    app.post('/', (req, res) => {
+        res.send('cool info');
+    });
+
     app.listen(port);
 
     return port;
