@@ -1,9 +1,7 @@
 const vscode = require('vscode');
 const fs = require('fs');
 const open = require('open');
-const {
-	bootServer
-} = require('./server');
+const bootServer = require('./server');
 
 const global = {};
 const cache = {};
@@ -192,21 +190,21 @@ function checkJson(json) {
  * This function updates all the global variables to the current settings.
  */
 function defineCurrentSettings() {
-	global.iconString = vscode.workspace.getConfiguration().get('Icon Style');
+	global.iconString = vscode.workspace.getConfiguration().get('mimjas-time-tracker.iconStyle');
 	if (global.iconString == '') {
-		global.iconString = '$(circuit-board)';
-		vscode.workspace.getConfiguration().update('Icon Style', 'circuit-board', vscode.ConfigurationTarget.Global);
+		global.iconString = 'circuit-board';
+		vscode.workspace.getConfiguration().update('mimjas-time-tracker.iconStyle', 'circuit-board', vscode.ConfigurationTarget.Global);
 	}
 
 	global.iconString = `$(${global.iconString})`;
 
-	if (vscode.workspace.getConfiguration().get('Label Position') == 'Left') {
+	if (vscode.workspace.getConfiguration().get('mimjas-time-tracker.labelPosition') == 'Left') {
 		global.labelPosition = vscode.StatusBarAlignment.Left;
 	} else {
 		global.labelPosition = vscode.StatusBarAlignment.Right;
 	}
 
-	if (vscode.workspace.getConfiguration().get('Label Priority')) {
+	if (vscode.workspace.getConfiguration().get('mimjas-time-tracker.labelPriority')) {
 		if (global.labelPosition == vscode.StatusBarAlignment.Right) {
 			global.labelPriority = Infinity;
 		} else {
@@ -233,7 +231,7 @@ function unIdle(event) {
 }
 
 async function barItemPressed() {
-	await open('http://localhos:1892');
+	await open(`http://localhost:${bootServer()}`);
 }
 
 /**

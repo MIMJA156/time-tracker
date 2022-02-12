@@ -29,13 +29,13 @@
       {
         "title": "Mimjas Time Tracker",
         "properties": {
-          "Icon Style": {
+          "mimjas-time-tracker.iconStyle": {
             "type": "string",
             "default": "circuit-board",
             "description": "Type in the default codicon ID for the icon you want.\nList of icons -> https://code.visualstudio.com/api/references/icons-in-labels#icon-listing",
             "scope": "application"
           },
-          "Label Position": {
+          "mimjas-time-tracker.labelPosition": {
             "type": "string",
             "enum": [
               "Left",
@@ -44,10 +44,9 @@
             "default": "Left",
             "description": "Defines the position on the time label."
           },
-          "Label Priority": {
+          "mimjas-time-tracker.labelPriority": {
             "type": "boolean",
-            "default": "false",
-            "description": "Is high priority"
+            "description": "Will be more towards the center of the statues bar when on."
           }
         }
       }
