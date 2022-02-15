@@ -163,6 +163,12 @@ function checkJson(json) {
 	let checkedJson = json;
 	let previous = null;
 
+	/*{<old name>:<new name>}*/
+	const renamed = {};
+
+	/*[<name>]*/
+	const removed = [];
+
 	if (json[global.currentTime()[0]] == undefined) {
 		checkedJson[global.currentTime()[0]] = {};
 		hasChanged = true;
