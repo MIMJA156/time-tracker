@@ -26,20 +26,7 @@ global.currentTime = () => {
 	const hh = today.getHours();
 	const min = today.getMinutes();
 	const sec = today.getSeconds();
-	const ww = today.getWeek();
-	return [yyyy, mm, dd, hh, min, sec, today, ww];
-}
-
-Date.prototype.getWeek = function () {
-	var target = new Date(this.valueOf());
-	var dayNr = (this.getDay() + 6) % 7;
-	target.setDate(target.getDate() - dayNr + 3);
-	var firstThursday = target.valueOf();
-	target.setMonth(0, 1);
-	if (target.getDay() != 4) {
-		target.setMonth(0, 1 + ((4 - target.getDay()) + 7) % 7);
-	}
-	return 1 + Math.ceil((firstThursday - target) / 604800000);
+	return [yyyy, mm, dd, hh, min, sec, today];
 }
 
 /**
@@ -198,11 +185,6 @@ function checkJson(json) {
 	if (previous.day == undefined) {
 		let dayKey = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
 		checkedJson[global.currentTime()[0]][global.currentTime()[1]][global.currentTime()[2]].day = dayKey[global.currentTime()[6].getDay()];
-		hasChanged = true;
-	}
-
-	if (previous.week == undefined) {
-		checkedJson[global.currentTime()[0]][global.currentTime()[1]][global.currentTime()[2]].week = global.currentTime()[7];
 		hasChanged = true;
 	}
 

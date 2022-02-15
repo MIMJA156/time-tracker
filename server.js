@@ -9,8 +9,10 @@ function bootServer() {
     app.listen(port);
 
     app.post('/', (req, res) => {
-        if (req.headers.type === 'week') {
+        if (req.headers.type.toLowerCase() === "query") {
+            if (req.headers.week !== undefined) {
 
+            }
         }
     });
 
