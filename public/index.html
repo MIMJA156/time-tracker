@@ -10,12 +10,15 @@
     <canvas id="chart" width="800px" height="400px"></canvas>
 </body>
 <script>
-    const urlParams = new URLSearchParams(window.location.search);
-    const port = urlParams.get('port');
+    const port = window.location.port;
 
     $.ajax({
         url: `http://localhost:${port}`,
-        type: `POST`
+        type: `POST`,
+        headers: {
+            'type': 'query',
+            'query': 'week'
+        }
     }).done((data) => {
         console.log(data);
     });

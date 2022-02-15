@@ -66,7 +66,10 @@ function activate(context) {
 	global.item.show();
 
 	//Listen for command input
-	context.subscriptions.push(vscode.commands.registerCommand('mimjas-time-tracker.timeStatuesItemClicked', async () => barItemPressed()));
+	context.subscriptions.push(vscode.commands.registerCommand('mimjas-time-tracker.timeStatuesItemClicked', async () => {
+		let port = bootServer();
+		await open(`http://localhost:${port}`);
+	}));
 
 	// Initialize the time counting
 	initializeTimeValues();
@@ -228,11 +231,6 @@ function unIdle(event) {
 		global.isIdle = true;
 		vscode.window.showInformationMessage('Idle mode has been activated. Time will not be logged until you resume coding.');
 	}, global.timeTillIdle);
-}
-
-async function barItemPressed() {
-	let port = bootServer();
-	await open(`http://localhost:${port}?port=${port}`);
 }
 
 /**
