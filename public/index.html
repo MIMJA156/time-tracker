@@ -19,10 +19,20 @@
         type: `POST`,
         headers: {
             'type': 'query',
-            'week': ''
+            'week': 'filler'
         }
     }).done((info) => {
         const chart = document.getElementById('chart');
+
+        let time = [];
+
+        info.forEach(element => {
+            try {
+                time[time.length] = element.active / 60;
+            } catch (e) {
+                time[time.length] = 0;
+            }
+        });
 
         let barChart = new Chart(chart, {
             type: 'bar',
@@ -31,10 +41,10 @@
                     'Saturday'
                 ],
                 datasets: [{
-                    label: 'Time Coding',
+                    label: 'Time Coding in Minutes',
                     borderColor: '#00FF00',
                     backgroundColor: '#C3B1E1',
-                    data: info,
+                    data: time,
                 }]
             }
         })

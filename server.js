@@ -14,13 +14,13 @@ function bootServer() {
 
     app.listen(port);
 
-    app.post('/', (req, res) => {
+    app.post('/', async (req, res) => {
         if (req.headers.type.toLowerCase() === "query") {
             if (req.headers.week !== undefined) {
-                const today = new Date();
-                const year = today.getFullYear();
-                const month = today.getMonth() + 1;
-                const day = today.getDate();
+                let today = new Date();
+                let year = today.getFullYear();
+                let month = today.getMonth() + 1;
+                let day = today.getDate();
 
                 const storedJson = JSON.parse(fs.readFileSync(`${__dirname}/../${global.fileDir}/${global.fileName}.json`, 'utf8'));
 
@@ -36,22 +36,65 @@ function bootServer() {
 
                 let currentDay = daysToNumbersKey[storedJson[year][month][day].day];
 
-                function loopTillValue(val, till, sign) {
-                    let loops = 0;
+                let a = await loopTillValue(currentDay, 0, '<');
+                // let b = await loopTillValue(currentDay, 6, '>');
 
-                    let isDone = new Promise((resolve, reject) => {
+                // if (day - a <= 0) {
 
-                    })
+                // }
 
-                    let internalLoop = (val, till, sign, loops, resolve, reject) => {
+                // if (day + b >= getDaysInMonth(month, year)) {
 
-                    }
+                // }
+
+                let week = [];
+
+                for (let i = 0; i <= 6; i++) {
+                    week[week.length] = storedJson[year][month][day - a + i];
                 }
+
+                res.send(week);
             }
         }
     });
 
     return port;
+}
+
+function getDaysInMonth(month, year) {
+    return new Date(year, month, 0).getDate();
+};
+
+async function loopTillValue(val, till, sign) {
+    let loops = 0;
+    let depth = 7
+
+    let internalLoop = (val, till, sign, loops, resolve, reject) => {
+        if (loops > depth) reject('Too many loops');
+        if (sign === '>') {
+            if (val >= till) {
+                resolve(loops);
+            } else {
+                loops++;
+                val++;
+                internalLoop(val, till, sign, loops, resolve, reject);
+            }
+        } else if (sign === '<') {
+            if (val <= till) {
+                resolve(loops);
+            } else {
+                loops++;
+                val--;
+                internalLoop(val, till, sign, loops, resolve, reject);
+            }
+        }
+    }
+
+    let isDone = new Promise((resolve, reject) => {
+        internalLoop(val, till, sign, loops, resolve, reject);
+    })
+
+    return await isDone;
 }
 
 module.exports = bootServer;
