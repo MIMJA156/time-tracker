@@ -7,7 +7,9 @@
 </head>
 
 <body>
-    <canvas id="chart" width="800px" height="400px"></canvas>
+    <div>
+        <canvas id="chart"></canvas>
+    </div>
 </body>
 <script>
     const port = window.location.port;
@@ -19,24 +21,24 @@
             'type': 'query',
             'week': ''
         }
-    }).done((data) => {
-        console.log(data);
+    }).done((info) => {
+        const chart = document.getElementById('chart');
+
+        let barChart = new Chart(chart, {
+            type: 'bar',
+            data: {
+                labels: ['Saturday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday',
+                    'Saturday'
+                ],
+                datasets: [{
+                    label: 'Time Coding',
+                    borderColor: '#00FF00',
+                    backgroundColor: '#C3B1E1',
+                    data: info,
+                }]
+            }
+        })
     });
-
-    const chart = document.getElementById('chart');
-
-    let barChart = new Chart(chart, {
-        type: 'bar',
-        data: {
-            labels: ['Saturday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
-            datasets: [{
-                label: 'Time Coding',
-                borderColor: '#00FF00',
-                backgroundColor: '#C3B1E1',
-                data: [70, 100, 40, 150, 20, 50, 24],
-            }]
-        }
-    })
 </script>
 
 </html>

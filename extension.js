@@ -14,6 +14,8 @@ global.fileDir = "time-tracker-storage-mimja";
 global.fileName = "time.mim";
 global.idleTimeout = null;
 
+module.exports.extensionGlobals = global;
+
 /**
  * This functions returns an array containing information about the current local time.
  * @returns {[year, month, day, hour, minute, sec, today]}
