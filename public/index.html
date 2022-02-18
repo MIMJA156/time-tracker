@@ -24,30 +24,88 @@
     }).done((info) => {
         const chart = document.getElementById('chart');
 
-        let time = [];
+        var time = [];
 
         info.forEach(element => {
-            try {
-                time[time.length] = element.active / 60;
-            } catch (e) {
-                time[time.length] = 0;
-            }
+            if (element == null) return time[time.length] = 0;
+            time[time.length] = element.active;
         });
 
-        let barChart = new Chart(chart, {
+        var hours = [];
+
+        time.forEach(element => {
+            let difference = 0;
+            if ((element / 60) >= 1) difference = element / 60 / 60;
+            hours[hours.length] = difference;
+        });
+
+        const barChart = new Chart(chart, {
             type: 'bar',
             data: {
-                labels: ['Saturday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday',
+                labels: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday',
                     'Saturday'
                 ],
                 datasets: [{
-                    label: 'Time Coding in Minutes',
+                    label: 'Time Spent Coding This Week',
                     borderColor: '#00FF00',
                     backgroundColor: '#C3B1E1',
-                    data: time,
+                    data: hours,
                 }]
+            },
+            options: {
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: function (context) {
+                                let hours = `${(time[context.dataIndex] / 60) / 60}`.split('.')[0];
+                                let minutes = `${((time[context.dataIndex] / 60) - (hours * 60))}`
+                                    .split('.')[0];
+
+                                let h_s = `${hours} hr`;
+                                let m_s = `${minutes} min`;
+
+                                if (hours <= 0) h_s = '';
+                                if (minutes <= 0) m_s = '';
+                                if (hours > 1) h_s = `${h_s}s`;
+                                if (minutes > 1) m_s = `${m_s}s`;
+
+                                return `${h_s} ${m_s}`;
+                            }
+                        }
+                    }
+                }
             }
         })
+
+        setInterval(() => {
+            $.ajax({
+                url: `http://localhost:${port}`,
+                type: `POST`,
+                headers: {
+                    'type': 'query',
+                    'week': 'filler'
+                }
+            }).done((info) => {
+                time = [];
+
+                info.forEach(element => {
+                    if (element == null) return time[time.length] = 0;
+                    time[time.length] = element.active;
+                });
+
+                hours = [];
+
+                time.forEach(element => {
+                    let difference = 0;
+                    if ((element / 60) >= 1) difference = element / 60 / 60;
+                    hours[hours.length] = difference;
+                });
+
+                barChart.data.datasets[0].data = hours;
+
+                barChart.update();
+            });
+        }, 15000);
     });
 </script>
 

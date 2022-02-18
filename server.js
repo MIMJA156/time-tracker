@@ -36,21 +36,12 @@ function bootServer() {
 
                 let currentDay = daysToNumbersKey[storedJson[year][month][day].day];
 
-                let a = await loopTillValue(currentDay, 0, '<');
-                // let b = await loopTillValue(currentDay, 6, '>');
-
-                // if (day - a <= 0) {
-
-                // }
-
-                // if (day + b >= getDaysInMonth(month, year)) {
-
-                // }
+                let daysSinceLastSunday = await loopTillValue(currentDay, 0, '<');
 
                 let week = [];
 
                 for (let i = 0; i <= 6; i++) {
-                    week[week.length] = storedJson[year][month][day - a + i];
+                    week[week.length] = storedJson[year][month][day - daysSinceLastSunday + i];
                 }
 
                 res.send(week);
@@ -70,7 +61,7 @@ async function loopTillValue(val, till, sign) {
     let depth = 7
 
     let internalLoop = (val, till, sign, loops, resolve, reject) => {
-        if (loops > depth) reject('Too many loops');
+        if (loops > depth) reject('Too many loops.');
         if (sign === '>') {
             if (val >= till) {
                 resolve(loops);
