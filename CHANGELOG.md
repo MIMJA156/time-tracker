@@ -57,3 +57,8 @@ All Changes made are logged in this file.
 ## 0.3.4
 
 -  Fixed a bug where you would loose time when closing the editor at a certain time
+
+## 1.0.0
+
+- Added a way to see your weekly time on a graph
+- Added a new command (cat coding)

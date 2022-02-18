@@ -17,12 +17,9 @@ function bootServer() {
     app.post('/', async (req, res) => {
         if (req.headers.type.toLowerCase() === "query") {
             if (req.headers.week !== undefined) {
-                console.log(req.headers.week);
-
-                let today = new Date(req.headers.week);
-                let year = today.getFullYear();
-                let month = today.getMonth() + 1;
-                let day = today.getDate();
+                let year = req.headers.week.split('/')[0];
+                let month = req.headers.week.split('/')[1];
+                let day = req.headers.week.split('/')[2];
 
                 const storedJson = JSON.parse(fs.readFileSync(`${__dirname}/../${global.fileDir}/${global.fileName}.json`, 'utf8'));
 
@@ -36,12 +33,24 @@ function bootServer() {
                     'saturday': 6
                 }
 
-                let currentDay;
-                try{
-                    currentDay = daysToNumbersKey[storedJson[year][month][day].day];
-                }catch(e){
-                    currentDay = today.getDay();
+                let oldDay = day;
+
+                if (day <= 0) {
+                    month -= 1;
+                    if (month <= 0) {
+                        year -= 1;
+                    }
+                    day = parseFloat(getDaysInMonth(month, year)) + parseFloat(oldDay);
                 }
+
+                let currentDay;
+                try {
+                    currentDay = daysToNumbersKey[storedJson[year][month][day].day];
+                } catch (e) {
+                    currentDay = new Date(`${year}/${month}/${day}`).getDay();
+                }
+
+                console.log(`${year}/${month}/${day}`);
 
                 let daysSinceLastSunday = await loopTillValue(currentDay, 0, '<');
 

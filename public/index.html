@@ -22,9 +22,9 @@
 
 <body>
     <div class="top-bar">
-        <!-- <button class="left" id="back">Back One Week</button> -->
+        <button class="left" id="back">Back One Week</button>
         <span id="time-till-next-reload-span">2</span>
-        <!-- <button class="right" id="forward">Forward One Week</button> -->
+        <button class="right" id="forward">Forward One Week</button>
     </div>
 
     <canvas id="chart"></canvas>
@@ -40,7 +40,7 @@
         let mm = String(today.getMonth() + 1).padStart(2, '0');
         let yyyy = today.getFullYear();
 
-        today = `${parseFloat(yyyy)}-${parseFloat(mm)}-${parseFloat(dd) + inTheFuture}`;
+        today = `${parseFloat(yyyy)}/${parseFloat(mm)}/${parseFloat(dd) + inTheFuture}`;
         return today;
     }
 </script>
