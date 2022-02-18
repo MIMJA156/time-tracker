@@ -72,9 +72,15 @@ function getDaysInMonth(month, year) {
     return new Date(year, month, 0).getDate();
 };
 
+/**
+ * @param {number} val The number you want to check
+ * @param {number} till The number you want to loop to
+ * @param {string} sign Use `<` or `>`
+ * @returns The number of times it took to reach `till` from `val`
+ */
 async function loopTillValue(val, till, sign) {
     let loops = 0;
-    let depth = 7
+    let depth = 7;
 
     let internalLoop = (val, till, sign, loops, resolve, reject) => {
         if (loops > depth) reject('Too many loops.');
