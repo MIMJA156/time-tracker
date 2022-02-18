@@ -243,7 +243,7 @@ function unIdle(event) {
 
 /**
  * @param {string} filepath 
- * @returns file type
+ * @returns {string} file type
  */
 function parse(filepath) {
 	return filepath.substring(filepath.lastIndexOf('.') + 1, filepath.length);

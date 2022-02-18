@@ -5,14 +5,35 @@
     <script src="./dependances/chart.js"></script>
     <script src="./dependances/jquery-3.6.0.js"></script>
 </head>
+<style>
+    .top-bar {
+        width: 100%;
+        text-align: center;
+    }
+
+    .left {
+        float: left;
+    }
+
+    .right {
+        float: right;
+    }
+</style>
 
 <body>
-    <div>
-        <canvas id="chart"></canvas>
+    <div class="top-bar">
+        <span class="left">1</span>
+        <span id="time-till-next-reload-span">2</span>
+        <span class="right">3</span>
     </div>
+
+    <canvas id="chart"></canvas>
 </body>
 <script>
     const port = window.location.port;
+
+    $('#time-till-next-reload-span').text(`Initail Query...`);
+
 
     $.ajax({
         url: `http://localhost:${port}`,
@@ -77,36 +98,81 @@
             }
         })
 
-        setInterval(() => {
-            $.ajax({
-                url: `http://localhost:${port}`,
-                type: `POST`,
-                headers: {
-                    'type': 'query',
-                    'week': 'filler'
+        startNextQuery();
+        function startNextQuery() {
+            let loops = 15;
+            let interval = setInterval(() => {
+                loops--;
+                $('#time-till-next-reload-span').text(`Next Query In ${loops + 1} seconds.`);
+                if (loops + 1 <= 0) {
+                    clearInterval(interval);
+
+                    $('#time-till-next-reload-span').text(`Sending Query...`);
+
+                    $.ajax({
+                        url: `http://localhost:${port}`,
+                        type: `POST`,
+                        headers: {
+                            'type': 'query',
+                            'week': 'filler'
+                        }
+                    }).done((info) => {
+                        time = [];
+
+                        info.forEach(element => {
+                            if (element == null) return time[time.length] = 0;
+                            time[time.length] = element.active;
+                        });
+
+                        hours = [];
+
+                        time.forEach(element => {
+                            let difference = 0;
+                            if ((element / 60) >= 1) difference = element / 60 / 60;
+                            hours[hours.length] = difference;
+                        });
+
+                        barChart.data.datasets[0].data = hours;
+
+                        barChart.update();
+
+                        startNextQuery();
+                    });
                 }
-            }).done((info) => {
-                time = [];
-
-                info.forEach(element => {
-                    if (element == null) return time[time.length] = 0;
-                    time[time.length] = element.active;
-                });
-
-                hours = [];
-
-                time.forEach(element => {
-                    let difference = 0;
-                    if ((element / 60) >= 1) difference = element / 60 / 60;
-                    hours[hours.length] = difference;
-                });
-
-                barChart.data.datasets[0].data = hours;
-
-                barChart.update();
-            });
-        }, 15000);
+            }, 1000);
+        }
     });
 </script>
 
 </html>
+
+<!--
+$.ajax({
+                    url: `http://localhost:${port}`,
+                    type: `POST`,
+                    headers: {
+                        'type': 'query',
+                        'week': 'filler'
+                    }
+                }).done((info) => {
+                    time = [];
+
+                    info.forEach(element => {
+                        if (element == null) return time[time.length] = 0;
+                        time[time.length] = element.active;
+                    });
+
+                    hours = [];
+
+                    time.forEach(element => {
+                        let difference = 0;
+                        if ((element / 60) >= 1) difference = element / 60 / 60;
+                        hours[hours.length] = difference;
+                    });
+
+                    barChart.data.datasets[0].data = hours;
+
+                    barChart.update();
+                });
+
+-->
