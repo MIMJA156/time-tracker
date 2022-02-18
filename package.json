@@ -25,6 +25,12 @@
     }
   },
   "contributes": {
+    "commands": [
+      {
+        "command": "mimjas-time-tracker.showCat",
+        "title": "Show the Fabled Cat GIF"
+      }
+    ],
     "configuration": [
       {
         "title": "Mimjas Time Tracker",

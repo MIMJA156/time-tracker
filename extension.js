@@ -87,6 +87,11 @@ function activate(context) {
 	vscode.window.onDidOpenTerminal(terminal => unIdle(terminal));
 	vscode.window.onDidCloseTerminal(terminal => unIdle(terminal));
 	vscode.window.onDidChangeWindowState(state => unIdle(state));
+
+	//Create any random commands.
+	const command = 'mimjas-time-tracker.showCat';
+
+	context.subscriptions.push(vscode.commands.registerCommand(command, showCat));
 }
 
 function updateBarItem() {
@@ -118,7 +123,7 @@ function initializeTimeValues() {
 	} catch (e) {
 		try {
 			fs.mkdirSync(`${__dirname}/../${global.fileDir}/`);
-		} catch (e) {};
+		} catch (e) { };
 		fs.writeFileSync(`${__dirname}/../${global.fileDir}/${global.fileName}.json`, '{}');
 		savedTimeJson = fs.readFileSync(`${__dirname}/../${global.fileDir}/${global.fileName}.json`, 'utf8');
 	}
@@ -247,6 +252,24 @@ function unIdle(event) {
  */
 function parse(filepath) {
 	return filepath.substring(filepath.lastIndexOf('.') + 1, filepath.length);
+}
+
+/**
+ * Displays a Cat Image in new Tab, very important.
+ */
+function showCat() {
+	const panel = vscode.window.createWebviewPanel('catCoding', 'Cat Coding', vscode.ViewColumn.One, {});
+	panel.webview.html = `<!DOCTYPE html>
+	<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>Cat Coding - Image</title>
+	</head>
+	<body>
+		<img src="https://media.giphy.com/media/JIX9t2j0ZTN9S/giphy.gif" width="600" />
+	</body>
+	</html>`;
 }
 
 function deactivate() {
