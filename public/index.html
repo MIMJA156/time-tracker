@@ -22,27 +22,54 @@
 
 <body>
     <div class="top-bar">
-        <span class="left">1</span>
+        <!-- <button class="left" id="back">Back One Week</button> -->
         <span id="time-till-next-reload-span">2</span>
-        <span class="right">3</span>
+        <!-- <button class="right" id="forward">Forward One Week</button> -->
     </div>
 
     <canvas id="chart"></canvas>
 </body>
+
+<!--Week Change Buttons-->
 <script>
+    var inTheFuture = 0;
+
+    const currentWeek = () => {
+        let today = new Date();
+        let dd = String(today.getDate()).padStart(2, '0');
+        let mm = String(today.getMonth() + 1).padStart(2, '0');
+        let yyyy = today.getFullYear();
+
+        today = `${parseFloat(yyyy)}-${parseFloat(mm)}-${parseFloat(dd) + inTheFuture}`;
+        return today;
+    }
+</script>
+
+<!--Updating graph and initail boot up.-->
+<script>
+    var timeCounter;
     const port = window.location.port;
 
     $('#time-till-next-reload-span').text(`Initail Query...`);
-
 
     $.ajax({
         url: `http://localhost:${port}`,
         type: `POST`,
         headers: {
             'type': 'query',
-            'week': 'filler'
+            'week': currentWeek()
         }
     }).done((info) => {
+        $('#forward').click(() => {
+            inTheFuture += 7;
+            startNextQuery(0);
+        });
+
+        $('#back').click(() => {
+            inTheFuture -= 7;
+            startNextQuery(0);
+        });
+
         const chart = document.getElementById('chart');
 
         var time = [];
@@ -98,14 +125,15 @@
             }
         })
 
-        startNextQuery();
-        function startNextQuery() {
-            let loops = 15;
-            let interval = setInterval(() => {
+        startNextQuery(15);
+        function startNextQuery(givenloops) {
+            let loops = givenloops;
+            clearInterval(timeCounter);
+            timeCounter = setInterval(() => {
                 loops--;
-                $('#time-till-next-reload-span').text(`Next Query In ${loops + 1} seconds.`);
+                $('#time-till-next-reload-span').text(`Next Query in ${loops + 1} seconds.`);
                 if (loops + 1 <= 0) {
-                    clearInterval(interval);
+                    clearInterval(timeCounter);
 
                     $('#time-till-next-reload-span').text(`Sending Query...`);
 
@@ -114,7 +142,7 @@
                         type: `POST`,
                         headers: {
                             'type': 'query',
-                            'week': 'filler'
+                            'week': currentWeek()
                         }
                     }).done((info) => {
                         time = [];
@@ -136,7 +164,7 @@
 
                         barChart.update();
 
-                        startNextQuery();
+                        startNextQuery(15);
                     });
                 }
             }, 1000);
@@ -145,34 +173,3 @@
 </script>
 
 </html>
-
-<!--
-$.ajax({
-                    url: `http://localhost:${port}`,
-                    type: `POST`,
-                    headers: {
-                        'type': 'query',
-                        'week': 'filler'
-                    }
-                }).done((info) => {
-                    time = [];
-
-                    info.forEach(element => {
-                        if (element == null) return time[time.length] = 0;
-                        time[time.length] = element.active;
-                    });
-
-                    hours = [];
-
-                    time.forEach(element => {
-                        let difference = 0;
-                        if ((element / 60) >= 1) difference = element / 60 / 60;
-                        hours[hours.length] = difference;
-                    });
-
-                    barChart.data.datasets[0].data = hours;
-
-                    barChart.update();
-                });
-
--->

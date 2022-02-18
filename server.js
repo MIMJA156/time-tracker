@@ -17,7 +17,9 @@ function bootServer() {
     app.post('/', async (req, res) => {
         if (req.headers.type.toLowerCase() === "query") {
             if (req.headers.week !== undefined) {
-                let today = new Date();
+                console.log(req.headers.week);
+
+                let today = new Date(req.headers.week);
                 let year = today.getFullYear();
                 let month = today.getMonth() + 1;
                 let day = today.getDate();
@@ -34,7 +36,12 @@ function bootServer() {
                     'saturday': 6
                 }
 
-                let currentDay = daysToNumbersKey[storedJson[year][month][day].day];
+                let currentDay;
+                try{
+                    currentDay = daysToNumbersKey[storedJson[year][month][day].day];
+                }catch(e){
+                    currentDay = today.getDay();
+                }
 
                 let daysSinceLastSunday = await loopTillValue(currentDay, 0, '<');
 
