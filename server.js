@@ -15,59 +15,20 @@ function bootServer() {
     app.listen(port);
 
     app.post('/', async (req, res) => {
-        if (req.headers.type.toLowerCase() === "query") {
-            if (req.headers.week !== undefined) {
-                let year = req.headers.week.split('/')[0];
-                let month = req.headers.week.split('/')[1];
-                let day = req.headers.week.split('/')[2];
-
-                const storedJson = JSON.parse(fs.readFileSync(`${__dirname}/../${global.fileDir}/${global.fileName}.json`, 'utf8'));
-
-                const daysToNumbersKey = {
-                    'sunday': 0,
-                    'monday': 1,
-                    'tuesday': 2,
-                    'wednesday': 3,
-                    'thursday': 4,
-                    'friday': 5,
-                    'saturday': 6
-                }
-
-                let oldDay = day;
-
-                if (day <= 0) {
-                    month -= 1;
-                    if (month <= 0) {
-                        year -= 1;
-                    }
-                    day = parseFloat(getDaysInMonth(month, year)) + parseFloat(oldDay);
-                }
-
-                let currentDay;
-                try {
-                    currentDay = daysToNumbersKey[storedJson[year][month][day].day];
-                } catch (e) {
-                    currentDay = new Date(`${year}/${month}/${day}`).getDay();
-                }
-
-                console.log(`${year}/${month}/${day}`);
-
-                let daysSinceLastSunday = await loopTillValue(currentDay, 0, '<');
-
-                let week = [];
-
-                for (let i = 0; i <= 6; i++) {
-                    week[week.length] = storedJson[year][month][day - daysSinceLastSunday + i];
-                }
-
-                res.send(week);
-            }
-        }
+        console.log(req);
     });
 
     return port;
 }
 
+
+//Useful functions.
+
+/**
+ * @param {number} month 
+ * @param {number} year 
+ * @returns {number} The number of days in the month specified.
+ */
 function getDaysInMonth(month, year) {
     return new Date(year, month, 0).getDate();
 };

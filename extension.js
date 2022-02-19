@@ -123,7 +123,7 @@ function initializeTimeValues() {
 	} catch (e) {
 		try {
 			fs.mkdirSync(`${__dirname}/../${global.fileDir}/`);
-		} catch (e) { };
+		} catch (e) {};
 		fs.writeFileSync(`${__dirname}/../${global.fileDir}/${global.fileName}.json`, '{}');
 		savedTimeJson = fs.readFileSync(`${__dirname}/../${global.fileDir}/${global.fileName}.json`, 'utf8');
 	}
@@ -156,12 +156,6 @@ function checkJson(json) {
 	let hasChanged = false;
 	let checkedJson = json;
 	let previous = null;
-
-	/*{<old name>:<new name>}*/
-	const renamed = {};
-
-	/*[<name>]*/
-	const removed = [];
 
 	if (json[global.currentTime()[0]] == undefined) {
 		checkedJson[global.currentTime()[0]] = {};
