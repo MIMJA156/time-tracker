@@ -63,3 +63,6 @@ All Changes made are logged in this file.
 - Added a way to see your weekly time on a graph
 - Added a new command (cat coding)
 - Changed the time formatting (your time will be reset)
+
+## 1.0.1
+- Bug Fix - All days were off by one

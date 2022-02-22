@@ -128,8 +128,6 @@ function bootServer() {
             let x = firstDay;
 
             for (let i = 0; i < 7; i++) {
-                x++;
-
                 if (x > getDaysInMonth(firstMonth, firstYear)) {
                     y += 1;
                     if (y > 12) {
@@ -139,11 +137,15 @@ function bootServer() {
                     x = 1;
                 }
 
+                console.log(`${z}-${y}-${x}`);
+
                 try {
                     activeArray[i] = parsed[z][y][x]['active'];
                 } catch (e) {
                     activeArray[i] = 0;
                 }
+
+                x++;
             }
 
             return activeArray;

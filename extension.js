@@ -261,7 +261,7 @@ function showCat() {
 		<title>Cat Coding - Image</title>
 	</head>
 	<body>
-		<img src="https://media.giphy.com/media/JIX9t2j0ZTN9S/giphy.gif" width="600" />
+		<img src="https://media.giphy.com/media/JIX9t2j0ZTN9S/giphy.gif" width="650" />
 	</body>
 	</html>`;
 }
