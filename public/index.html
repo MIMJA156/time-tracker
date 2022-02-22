@@ -2,13 +2,14 @@
 <html lang="en">
 
 <head>
-    <script src="./dependances/chart.js"></script>
-    <script src="./dependances/jquery-3.6.0.js"></script>
+    <script src="./JS/jquery-3.6.0.js"></script>
+    <script src="./JS/chart.js"></script>
 </head>
 <style>
     .top-bar {
         width: 100%;
         text-align: center;
+        font-size: 30px;
     }
 
     .left {
@@ -18,77 +19,63 @@
     .right {
         float: right;
     }
+
+    .button {
+        background-color: cyan;
+        border: none;
+        height: 33px;
+        display: flex;
+        align-items: center;
+        font-size: 15px;
+    }
+
+    .button:hover {
+        filter: brightness(0.9);
+        cursor: pointer;
+    }
+
+    #time-till-next-reload-span {
+        font-size: 25px;
+    }
 </style>
 
 <body>
     <div class="top-bar">
-        <button class="left" id="back">Back One Week</button>
-        <span id="time-till-next-reload-span">2</span>
-        <button class="right" id="forward">Forward One Week</button>
+        <button class="left button" id="back"><img src="./SVGS/chevron-left.svg"><span id="back-text"></span></button>
+        <span id="time-till-next-reload-span"></span>
+        <button class="right button" id="forward"><span id="forward-text"></span><img
+                src="./SVGS/chevron-right.svg"></button>
     </div>
 
     <canvas id="chart"></canvas>
 </body>
 
-<!--Week Change Buttons-->
 <script>
-    var inTheFuture = 0;
-
-    const currentWeek = () => {
-        let today = new Date();
-        let dd = String(today.getDate()).padStart(2, '0');
-        let mm = String(today.getMonth() + 1).padStart(2, '0');
-        let yyyy = today.getFullYear();
-
-        today = `${parseFloat(yyyy)}/${parseFloat(mm)}/${parseFloat(dd) + inTheFuture}`;
-        console.log(today);
-        return today;
-    }
-</script>
-
-<!--Updating graph and initail boot up.-->
-<script>
-    var timeCounter;
-    const port = window.location.port;
-
-    $('#time-till-next-reload-span').text(`Initail Query...`);
+    var given = {
+        current: "2022-1-23/2022-1-29",
+        "2022-1-2/2022-1-8": {
+            active: [2000, 2000, 2000, 2000, 2000, 2000, 2000]
+        },
+        "2022-1-9/2022-1-15": {
+            active: [1500, 1500, 1500, 1500, 1500, 1500, 1500]
+        },
+        "2022-1-16/2022-1-22": {
+            active: [1000, 1000, 1000, 1000, 1000, 1000, 1000]
+        },
+        "2022-1-23/2022-1-29": {
+            active: [500, 500, 500, 500, 500, 500, 500]
+        }
+    };
 
     $.ajax({
-        url: `http://localhost:${port}`,
-        type: `POST`,
-        headers: {
-            'type': 'query',
-            'week': currentWeek()
-        }
-    }).done((info) => {
-        $('#forward').click(() => {
-            inTheFuture += 7;
-            startNextQuery(0);
-        });
+        url: `http://localhost:${window.location.port}/api/get-data`,
+        type: `POST`
+    }).done((e) => {
+        given = e;
 
-        $('#back').click(() => {
-            inTheFuture -= 7;
-            startNextQuery(0);
-        });
+        $('#time-till-next-reload-span').text(given.current);
 
-        const chart = document.getElementById('chart');
-
-        var time = [];
-
-        info.forEach(element => {
-            if (element == null) return time[time.length] = 0;
-            time[time.length] = element.active;
-        });
-
-        var hours = [];
-
-        time.forEach(element => {
-            let difference = 0;
-            if ((element / 60) >= 1) difference = element / 60 / 60;
-            hours[hours.length] = difference;
-        });
-
-        const barChart = new Chart(chart, {
+        const barChart = new Chart($('#chart'), {
             type: 'bar',
             data: {
                 labels: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday',
@@ -96,9 +83,8 @@
                 ],
                 datasets: [{
                     label: 'Time Spent Coding This Week',
-                    borderColor: '#00FF00',
-                    backgroundColor: '#C3B1E1',
-                    data: hours,
+                    backgroundColor: ['#000000'],
+                    data: given[given.current].active,
                 }]
             },
             options: {
@@ -106,71 +92,84 @@
                     tooltip: {
                         callbacks: {
                             label: function (context) {
-                                let hours = `${(time[context.dataIndex] / 60) / 60}`.split('.')[0];
-                                let minutes = `${((time[context.dataIndex] / 60) - (hours * 60))}`
-                                    .split('.')[0];
-
-                                let h_s = `${hours} hr`;
-                                let m_s = `${minutes} min`;
-
-                                if (hours <= 0) h_s = '';
-                                if (minutes <= 0) m_s = '';
-                                if (hours > 1) h_s = `${h_s}s`;
-                                if (minutes > 1) m_s = `${m_s}s`;
-
-                                return `${h_s} ${m_s}`;
+                                return given[given.current].active[context.dataIndex];
                             }
                         }
                     }
                 }
             }
-        })
+        });
 
-        startNextQuery(15);
-        function startNextQuery(givenloops) {
-            let loops = givenloops;
-            clearInterval(timeCounter);
-            timeCounter = setInterval(() => {
-                loops--;
-                $('#time-till-next-reload-span').text(`Next Query in ${loops + 1} seconds.`);
-                if (loops + 1 <= 0) {
-                    clearInterval(timeCounter);
+        $('#back').click(() => {
+            doMovement(false);
+            $('#time-till-next-reload-span').text(given.current);
+        });
 
-                    $('#time-till-next-reload-span').text(`Sending Query...`);
+        $('#forward').click(() => {
+            doMovement(true);
+            $('#time-till-next-reload-span').text(given.current);
+        });
 
-                    $.ajax({
-                        url: `http://localhost:${port}`,
-                        type: `POST`,
-                        headers: {
-                            'type': 'query',
-                            'week': currentWeek()
-                        }
-                    }).done((info) => {
-                        time = [];
+        function doMovement(type) {
+            let current = given.current;
+            let cut = current.split('/');
 
-                        info.forEach(element => {
-                            if (element == null) return time[time.length] = 0;
-                            time[time.length] = element.active;
-                        });
+            let firstDate = cut[0].split('-');
+            let secondDate = cut[1].split('-');
 
-                        hours = [];
+            for (let i = 0; i < firstDate.length; i++) {
+                firstDate[i] = parseInt(firstDate[i]);
+            }
+            for (let i = 0; i <
+                secondDate.length; i++) {
+                secondDate[i] = parseInt(secondDate[i]);
+            }
 
-                        time.forEach(element => {
-                            let difference = 0;
-                            if ((element / 60) >= 1) difference = element / 60 / 60;
-                            hours[hours.length] = difference;
-                        });
+            if (type) {
+                firstDate[2] += 7;
+                secondDate[2] += 7;
+            } else {
+                firstDate[2] -= 7;
+                secondDate[2] -= 7;
+            }
 
-                        barChart.data.datasets[0].data = hours;
-
-                        barChart.update();
-
-                        startNextQuery(15);
-                    });
+            if (firstDate[2] < 1) {
+                firstDate[1] -= 1;
+                if (firstDate[1] < 1) {
+                    firstDate[0] -= 1;
+                    firstDate[1] = 12;
                 }
-            }, 1000);
+                firstDate[2] = getDaysInMonth(firstDate[0], firstDate[1]) + firstDate[2];
+            }
+            if (secondDate[2] < 1) {
+                secondDate[1] -= 1;
+                if (secondDate[1] < 1) {
+                    secondDate[0] -= 1;
+                    secondDate[1] = 12;
+                }
+                secondDate[2] = getDaysInMonth(secondDate[0], secondDate[1]) + secondDate[2];
+            }
+            if (!given[
+                    `${firstDate[0]}-${firstDate[1]}-${firstDate[2]}/${secondDate[0]}-${secondDate[1]}-${secondDate[2]}`
+                ]) {
+                return;
+            };
+
+            given.current =
+                `${firstDate[0]}-${firstDate[1]}-${firstDate[2]}/${secondDate[0]}-${secondDate[1]}-${secondDate[2]}`;
+
+            barChart.data.datasets[0].data = given[given.current].active;
+            barChart.update();
         }
+
+        function getDaysInMonth(year, month) {
+            return parseFloat(new Date(year, month, 0).getDate());
+        };
     });
 </script>
 
 </html>
+
+<!-- ['#FF0000', '#FF7F00', '#FFFF00', '#00FF00', '#0000FF', ' #4B0082',
+'#9400D3'
+], -->
