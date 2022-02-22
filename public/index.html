@@ -19,20 +19,166 @@
     .right {
         float: right;
     }
+
+    .button {
+        background-color: cyan;
+        border: none;
+        height: 33px;
+        display: flex;
+        align-items: center;
+        font-size: 15px;
+    }
+
+    .button:hover {
+        filter: brightness(0.9);
+        cursor: pointer;
+    }
+
+    #time-till-next-reload-span {
+        font-size: 25px;
+    }
 </style>
 
 <body>
     <div class="top-bar">
-        <button class="left" id="back">Back One Week</button>
-        <span id="time-till-next-reload-span">2</span>
-        <button class="right" id="forward">Forward One Week</button>
+        <button class="left button" id="back"><img src="./SVGS/chevron-left.svg"><span id="back-text"></span></button>
+        <span id="time-till-next-reload-span"></span>
+        <button class="right button" id="forward"><span id="forward-text"></span><img
+                src="./SVGS/chevron-right.svg"></button>
     </div>
 
     <canvas id="chart"></canvas>
 </body>
 
 <script>
+    var given = {
+        current: "2022-1-23/2022-1-29",
+        "2022-1-2/2022-1-8": {
+            active: [2000, 2000, 2000, 2000, 2000, 2000, 2000]
+        },
+        "2022-1-9/2022-1-15": {
+            active: [1500, 1500, 1500, 1500, 1500, 1500, 1500]
+        },
+        "2022-1-16/2022-1-22": {
+            active: [1000, 1000, 1000, 1000, 1000, 1000, 1000]
+        },
+        "2022-1-23/2022-1-29": {
+            active: [500, 500, 500, 500, 500, 500, 500]
+        }
+    };
 
+    $.ajax({
+        url: `http://localhost:${window.location.port}/api/get-data`,
+        type: `POST`
+    }).done((e) => {
+        console.log(e);
+        given = e;
+    });
+
+    $('#time-till-next-reload-span').text(given.current);
+
+    const barChart = new Chart($('#chart'), {
+        type: 'bar',
+        data: {
+            labels: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday',
+                'Saturday'
+            ],
+            datasets: [{
+                label: 'Time Spent Coding This Week',
+                backgroundColor: [
+                    "#1b4b4e",
+                    "#2z125e",
+                    "#6f1d1d",
+                    "#645619",
+                    "#4f4f4f",
+                    "#000000",
+                    "#901274",
+                ],
+                data: given[given.current].active,
+            }]
+        },
+        options: {
+            plugins: {
+                tooltip: {
+                    callbacks: {
+                        label: function (context) {
+                            return given[given.current].active[context.dataIndex];
+                        }
+                    }
+                }
+            }
+        }
+    });
+
+    $('# back ').click(() => {
+        doMovement(false);
+        $('#time-till-next-reload-span').text(given.current);
+    });
+
+    $('#forward').click(() => {
+        doMovement(true);
+        $('#time-till-next-reload-span').text(given.current);
+    });
+
+    function doMovement(type) {
+        let current = given.current;
+        let cut = current.split('/');
+
+        let firstDate = cut[0].split('-');
+        let secondDate = cut[1].split('-');
+
+        for (let i = 0; i < firstDate.length; i++) {
+            firstDate[i] = parseInt(firstDate[i]);
+        }
+        for (let i = 0; i <
+            secondDate.length; i++) {
+            secondDate[i] = parseInt(secondDate[i]);
+        }
+
+        if (type) {
+            firstDate[2] += 7;
+            secondDate[2] += 7;
+        } else {
+            firstDate[2] -= 7;
+            secondDate[2] -= 7;
+        }
+
+        if (firstDate[2] < 1) {
+            firstDate[1] -= 1;
+            if (firstDate[1] < 1) {
+                firstDate[0] -= 1;
+                firstDate[1] = 12;
+            }
+            firstDate[2] = getDaysInMonth(firstDate[0], firstDate[1]) + firstDate[2];
+        }
+        if (secondDate[2] < 1) {
+            secondDate[1] -= 1;
+            if (secondDate[1] < 1) {
+                secondDate[0] -= 1;
+                secondDate[1] = 12;
+            }
+            secondDate[2] = getDaysInMonth(secondDate[0], secondDate[1]) + secondDate[2];
+        }
+        if (!given[
+                `${firstDate[0]}-${firstDate[1]}-${firstDate[2]}/${secondDate[0]}-${secondDate[1]}-${secondDate[2]}`
+            ]) {
+            return;
+        };
+
+        given.current =
+            `${firstDate[0]}-${firstDate[1]}-${firstDate[2]}/${secondDate[0]}-${secondDate[1]}-${secondDate[2]}`;
+
+        barChart.data.datasets[0].data = given[given.current].active;
+        barChart.update();
+    }
+
+    function getDaysInMonth(year, month) {
+        return parseFloat(new Date(year, month, 0).getDate());
+    };
 </script>
 
 </html>
+
+<!-- ['#FF0000', '#FF7F00', '#FFFF00', '#00FF00', '#0000FF', ' #4B0082',
+'#9400D3'
+], -->
