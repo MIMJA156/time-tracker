@@ -46,6 +46,39 @@ function bootServer() {
             'saturday': 6
         };
 
+        let tillEnd = await loopTillValue(today.getDay(), 6, '>');
+        let fromBeginning = await loopTillValue(today.getDay(), 0, '<');
+
+        let currentDay = day;
+        let currentMonth = month;
+        let currentYear = year;
+
+        currentDay -= fromBeginning;
+        if (currentDay < 1) {
+            currentMonth--;
+            if (currentMonth < 1) {
+                currentYear--;
+                currentMonth = 12;
+            }
+            currentDay = getDaysInMonth(currentMonth, currentYear);
+        }
+
+        let currentDay_2 = currentDay;
+        let currentMonth_2 = currentMonth;
+        let currentYear_2 = currentYear;
+
+        currentDay_2 += 6;
+        if (currentDay_2 > getDaysInMonth(currentMonth_2, currentYear_2)) {
+            currentMonth_2++;
+            if (currentMonth_2 > 12) {
+                currentYear_2++;
+                currentMonth_2 = 1;
+            }
+            currentDay_2 = 1;
+        }
+
+        graphDataChanged.current = `${currentYear}-${currentMonth}-${currentDay}/${currentYear_2}-${currentMonth_2}-${currentDay_2}`;
+
         if (parsed[firstYear][firstMonth][firstDay].day != 'sunday') {
             let loop = await loopTillValue(dayKey[parsed[firstYear][firstMonth][firstDay].day], 0, '<');
             firstDay -= loop;
@@ -135,12 +168,6 @@ function bootServer() {
             if (`${c}-${b}-${a}` === `${lastYear}-${lastMonth}-${lastDay}`) return;
 
             loopThroughAndSetData(depth + 1);
-        }
-
-        console.log(loopTillValue(dayKey[parsed[firstYear][firstMonth][firstDay].day], 0, '<'));
-
-        for (let i = 0; i < 8; i++) {
-            console.log(graphDataChanged[``]);
         }
 
         res.send(graphDataChanged);
