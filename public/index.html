@@ -67,6 +67,19 @@
         }
     };
 
+    let ping = () => {
+        $.ajax({
+            url: `http://localhost:${window.location.port}/api/ping`,
+            type: "GET",
+        }).done((data) => {
+            setTimeout(() => {
+                ping();
+            }, 1000 * 55);
+        });
+    }
+
+    ping();
+
     $.ajax({
         url: `http://localhost:${window.location.port}/api/get-data`,
         type: `POST`
@@ -92,7 +105,20 @@
                     tooltip: {
                         callbacks: {
                             label: function (context) {
-                                return given[given.current].active[context.dataIndex];
+                                let hours = `${(given[given.current].active[context.dataIndex] / 60) /
+                                60}`.split('.')[0];
+                                let minutes = `${((given[given.current].active[context.dataIndex] / 60) - (hours *
+                                60))}`.split('.')[0];
+
+                                let h_s = `${hours} hr`;
+                                let m_s = `${minutes} min`;
+
+                                if (hours <= 0) h_s = '';
+                                if (minutes <= 0) m_s = '';
+                                if (hours > 1) h_s = `${h_s}s`;
+                                if (minutes > 1) m_s = `${m_s}s`;
+
+                                return `${h_s} ${m_s}`;
                             }
                         }
                     }

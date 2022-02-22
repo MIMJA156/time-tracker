@@ -25,38 +25,34 @@
     }
   },
   "contributes": {
-    "commands": [
-      {
-        "command": "mimjas-time-tracker.showCat",
-        "title": "Show the Fabled Cat GIF"
-      }
-    ],
-    "configuration": [
-      {
-        "title": "Mimjas Time Tracker",
-        "properties": {
-          "mimjas-time-tracker.iconStyle": {
-            "type": "string",
-            "default": "circuit-board",
-            "description": "Type in the default codicon ID for the icon you want.\nList of icons -> https://code.visualstudio.com/api/references/icons-in-labels#icon-listing",
-            "scope": "application"
-          },
-          "mimjas-time-tracker.labelPosition": {
-            "type": "string",
-            "enum": [
-              "Left",
-              "Right"
-            ],
-            "default": "Left",
-            "description": "Defines the position on the time label."
-          },
-          "mimjas-time-tracker.labelPriority": {
-            "type": "boolean",
-            "description": "Will be more towards the center of the statues bar when on."
-          }
+    "commands": [{
+      "command": "mimjas-time-tracker.showCat",
+      "title": "Show the Fabled Cat GIF"
+    }],
+    "configuration": [{
+      "title": "Mimjas Time Tracker",
+      "properties": {
+        "mimjas-time-tracker.iconStyle": {
+          "type": "string",
+          "default": "circuit-board",
+          "description": "Type in the default codicon ID for the icon you want.\nList of icons -> https://code.visualstudio.com/api/references/icons-in-labels#icon-listing",
+          "scope": "application"
+        },
+        "mimjas-time-tracker.labelPosition": {
+          "type": "string",
+          "enum": [
+            "Left",
+            "Right"
+          ],
+          "default": "Left",
+          "description": "Defines the position on the time label."
+        },
+        "mimjas-time-tracker.labelPriority": {
+          "type": "boolean",
+          "description": "Will be more towards the center of the statues bar when on."
         }
       }
-    ]
+    }]
   },
   "devDependencies": {
     "eslint": "^8.6.0"

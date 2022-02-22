@@ -1,21 +1,34 @@
 const fs = require('fs');
 const port = 3457;
 const Express = require('express');
-const {
-    emit
-} = require('process');
 
 const global = {};
 
 global.fileDir = "time-tracker-storage-mimja";
 global.fileName = "time.mim";
+global.active = false;
+global.idleTimeout = null;
+global.server;
 
 function bootServer() {
+    if (global.active) return port;
+    global.active = true;
+
     let app = Express();
 
     app.use(Express.static(`${__dirname}/public/`));
 
-    app.listen(port);
+    global.server = app.listen(port);
+
+    app.get('/api/ping', async (req, res) => {
+        clearTimeout(global.idleTimeout);
+        global.idleTimeout = setTimeout(() => {
+            global.server.close(() => {
+                global.active = false;
+            });
+        }, 1000 * 60);
+        res.send('pong');
+    });
 
     app.post('/api/get-data', async (req, res) => {
         const unParsed = fs.readFileSync(`${__dirname}/../${global.fileDir}/${global.fileName}.json`, 'utf8');
@@ -46,7 +59,6 @@ function bootServer() {
             'saturday': 6
         };
 
-        let tillEnd = await loopTillValue(today.getDay(), 6, '>');
         let fromBeginning = await loopTillValue(today.getDay(), 0, '<');
 
         let currentDay = day;
@@ -137,9 +149,7 @@ function bootServer() {
             return activeArray;
         }
 
-        loopThroughAndSetData();
-
-        function loopThroughAndSetData(depth) {
+        let loopThroughAndSetData = (depth) => {
             depth = depth ? depth : 0;
 
             let a = firstDay + 6;
@@ -169,6 +179,8 @@ function bootServer() {
 
             loopThroughAndSetData(depth + 1);
         }
+
+        loopThroughAndSetData();
 
         res.send(graphDataChanged);
     });
