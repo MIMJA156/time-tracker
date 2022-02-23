@@ -30,6 +30,10 @@ function bootServer() {
         res.send('pong');
     });
 
+    app.post('/api/update', async (req, res) => {
+
+    });
+
     app.post('/api/get-data', async (req, res) => {
         const unParsed = fs.readFileSync(`${__dirname}/../${global.fileDir}/${global.fileName}.json`, 'utf8');
         const parsed = JSON.parse(unParsed);
@@ -136,8 +140,6 @@ function bootServer() {
                     }
                     x = 1;
                 }
-
-                console.log(`${z}-${y}-${x}`);
 
                 try {
                     activeArray[i] = parsed[z][y][x]['active'];

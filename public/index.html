@@ -34,20 +34,27 @@
         cursor: pointer;
     }
 
-    #time-till-next-reload-span {
+    #current-date {
         font-size: 25px;
+    }
+
+    .graph-container {
+        padding-left: 20px;
+        padding-right: 20px;
     }
 </style>
 
 <body>
     <div class="top-bar">
         <button class="left button" id="back"><img src="./SVGS/chevron-left.svg"><span id="back-text"></span></button>
-        <span id="time-till-next-reload-span"></span>
+        <span id="current-date"></span>
         <button class="right button" id="forward"><span id="forward-text"></span><img
                 src="./SVGS/chevron-right.svg"></button>
     </div>
 
-    <canvas id="chart"></canvas>
+    <div class="graph-container">
+        <canvas id="chart"></canvas>
+    </div>
 </body>
 
 <script>
@@ -83,10 +90,8 @@
     $.ajax({
         url: `http://localhost:${window.location.port}/api/get-data`,
         type: `POST`
-    }).done((e) => {
-        given = e;
-
-        $('#time-till-next-reload-span').text(given.current);
+    }).done((given) => {
+        $('#current-date').text(given.current);
 
         const barChart = new Chart($('#chart'), {
             type: 'bar',
@@ -128,12 +133,12 @@
 
         $('#back').click(() => {
             doMovement(false);
-            $('#time-till-next-reload-span').text(given.current);
+            $('#current-date').text(given.current);
         });
 
         $('#forward').click(() => {
             doMovement(true);
-            $('#time-till-next-reload-span').text(given.current);
+            $('#current-date').text(given.current);
         });
 
         function doMovement(type) {
@@ -195,7 +200,3 @@
 </script>
 
 </html>
-
-<!-- ['#FF0000', '#FF7F00', '#FFFF00', '#00FF00', '#0000FF', ' #4B0082',
-'#9400D3'
-], -->
