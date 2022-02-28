@@ -1,31 +1,85 @@
 const vscode = require('vscode');
 const fs = require('fs');
+const open = require('open');
+const bootServer = require('./server');
+
+const global = {};
+const cache = {};
+
+global.json = {};
+global.isIdle = false;
+global.minutesInADay = 1440;
+global.timeTillIdle = 5 * 60 * 1000;
+global.fileDir = "time-tracker-storage-mimja";
+global.fileName = "time.mim";
+global.idleTimeout = null;
+
+module.exports.extensionGlobals = global;
+
+/**
+ * This functions returns an array containing information about the current local time.
+ * @returns {[year, month, day, hour, minute, sec, today]}
+ */
+global.currentTime = () => {
+	const today = new Date();
+	const yyyy = today.getFullYear();
+	const mm = today.getMonth() + 1;
+	const dd = today.getDate();
+	const hh = today.getHours();
+	const min = today.getMinutes();
+	const sec = today.getSeconds();
+	return [yyyy, mm, dd, hh, min, sec, today];
+}
 
 /**
  * @param {vscode.ExtensionContext} context
  */
-
-const global = {};
-
 function activate(context) {
-	var icon = vscode.workspace.getConfiguration().get('Icon Style');
-	icon = `$(${icon})`;
-	if (icon == '') {
-		icon = '$(circuit-board)';
-		vscode.workspace.getConfiguration().update('Icon Style', 'circuit-board', vscode.ConfigurationTarget.Global);
-	}
+	//Get the current settings
+	defineCurrentSettings();
+	cache.labelPosition = global.labelPosition;
+	cache.labelPriority = global.labelPriority;
+	cache.iconString = global.iconString;
 
 	vscode.workspace.onDidChangeConfiguration(() => {
-		icon = vscode.workspace.getConfiguration().get('Icon Style');
-		if (icon == '') {
-			icon = '$(circuit-board)';
-			vscode.workspace.getConfiguration().update('Icon Style', 'circuit-board', vscode.ConfigurationTarget.Global);
+		defineCurrentSettings();
+
+		if (global.labelPosition !== cache.labelPosition || global.labelPriority !== cache.labelPriority) {
+			vscode.window.showInformationMessage('Reload VSCode to see the changes.', 'Reload').then(selection => {
+				if (selection == 'Reload') {
+					vscode.commands.executeCommand("workbench.action.reloadWindow");
+				}
+			});
 		}
-		icon = `$(${icon})`;
-		item.text = `${icon} ${timeString(hours, minutes)}`;
+
+		if (global.iconString !== cache.iconString) {
+			updateBarItem();
+		}
+
+		cache.labelPosition = global.labelPosition;
+		cache.labelPriority = global.labelPriority;
+		cache.iconString = global.iconString;
 	})
 
-	resetIdleTimeout(300000);
+	// create the bar icon
+	global.item = vscode.window.createStatusBarItem(global.labelPosition, global.labelPriority);
+	global.item.command = 'mimjas-time-tracker.timeStatuesItemClicked';
+	context.subscriptions.push(global.item);
+	global.item.show();
+
+	//Listen for command input
+	context.subscriptions.push(vscode.commands.registerCommand('mimjas-time-tracker.timeStatuesItemClicked', async () => {
+		let port = bootServer();
+		await open(`http://localhost:${port}`);
+	}));
+
+	// Initialize the time counting
+	initializeTimeValues();
+	updateBarItem();
+	initiateCounting();
+	unIdle(69);
+
+	// Listen for un-idle events
 	vscode.workspace.onDidChangeTextDocument(changeEvent => unIdle(changeEvent));
 	vscode.workspace.onDidCreateFiles(createEvent => unIdle(createEvent));
 	vscode.workspace.onDidDeleteFiles(deleteEvent => unIdle(deleteEvent));
@@ -34,138 +88,18 @@ function activate(context) {
 	vscode.window.onDidCloseTerminal(terminal => unIdle(terminal));
 	vscode.window.onDidChangeWindowState(state => unIdle(state));
 
-	function unIdle(e) {
-		try {
-			let file_path = e.document.uri.path.split('.');
-			global.current_file_type = file_path[file_path.length - 1];
-		} catch (e) {
-			global.current_file_type = 'unknown';
-		}
-		resetIdleTimeout(300000);
-	}
+	//Create any random commands.
+	const command = 'mimjas-time-tracker.showCat';
 
-	const myCommandId = 'mimjas-time-tracker.timeStatuesItemClicked';
-	context.subscriptions.push(vscode.commands.registerCommand(myCommandId, async () => {
-		// Create and show panel
-		const panel = vscode.window.createWebviewPanel(
-			'catCoding',
-			'Cat Coding',
-			vscode.ViewColumn.One, {}
-		);
-
-		// And set its HTML content
-		panel.webview.html = getWebviewContent();
-	}));
-
-	function getWebviewContent() {
-		return `<!DOCTYPE html>
-	  <html lang="en">
-	  <head>
-		  <meta charset="UTF-8">
-		  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-		  <title>Cat Coding - Image</title>
-	  </head>
-	  <body>
-		  <img src="https://media.giphy.com/media/JIX9t2j0ZTN9S/giphy.gif" width="500" />
-	  </body>
-	  </html>`;
-	}
-
-	const item = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 1);
-	item.command = myCommandId;
-	context.subscriptions.push(item);
-
-	try {
-		global.full = JSON.parse(fs.readFileSync(`${__dirname}/../time-tracker-storage-mimja/time.json`));
-	} catch (e) {
-		fs.mkdirSync(`${__dirname}/../time-tracker-storage-mimja/`);
-		fs.writeFileSync(`${__dirname}/../time-tracker-storage-mimja/time.json`, '{}');
-		global.full = {};
-	}
-
-	const currentTime = getCurrentTime();
-	try {
-		if (global.full[currentTime[0]] == null) throw new Error('year');
-		if (global.full[currentTime[0]].months[currentTime[1]][currentTime[2]].active == null) throw new Error('missing');
-		if (global.full[currentTime[0]].months[currentTime[1]][currentTime[2]].graph == null) throw new Error('missing');
-	} catch (e) {
-		updateAllJson(e);
-	}
-
-	var hours = `${(global.full[currentTime[0]].months[currentTime[1]][currentTime[2]].active / 60)}`.split('.')[0];
-	var minutes = (global.full[currentTime[0]].months[currentTime[1]][currentTime[2]].active - (hours * 60));
-
-	item.text = `${icon} ${timeString(hours, minutes)}`;
-	item.tooltip = `Time Spent Coding on ${getNumberDate()}`;
-	item.show();
-
-	let count = 0;
-	let tillGraph = 0;
-	setInterval(() => {
-		count++;
-		if (count >= 60 && global.idle != true) {
-			tillGraph++;
-			count = 0;
-			const currentTime = getCurrentTime();
-
-			if (!global.full[currentTime[0]]) newYearOfTimeJson();
-
-			hours = `${(global.full[currentTime[0]].months[currentTime[1]][currentTime[2]].active / 60)}`.split('.')[0];
-			minutes = (global.full[currentTime[0]].months[currentTime[1]][currentTime[2]].active - (hours * 60));
-
-			minutes++;
-			if (minutes >= 60) {
-				minutes = 0;
-				hours++;
-			}
-
-			item.text = `${icon} ${timeString(hours, minutes)}`;
-			item.tooltip = `Time Spent Coding on ${getNumberDate()}`;
-			item.show();
-
-			global.full[currentTime[0]].months[currentTime[1]][currentTime[2]].active++;
-			if (tillGraph >= 15) {
-				global.full[currentTime[0]].months[currentTime[1]][currentTime[2]].graph.push({
-					time: {
-						hours: currentTime[3],
-						minutes: currentTime[4]
-					},
-					data: global.full[currentTime[0]].months[currentTime[1]][currentTime[2]].active
-				});
-				tillGraph = 0;
-			}
-			fs.writeFileSync(`${__dirname}/../time-tracker-storage-mimja/time.json`, JSON.stringify(global.full, null, 4));
-		} else if (global.idle == true) {
-			count--;
-		}
-	}, 1000);
+	context.subscriptions.push(vscode.commands.registerCommand(command, showCat));
 }
 
-// this method is called when your extension is deactivated.
-function deactivate() {}
+function updateBarItem() {
+	let seconds = global.json[global.currentTime()[0]][global.currentTime()[1]][global.currentTime()[2]].active;
 
-module.exports = {
-	activate,
-	deactivate
-}
+	let hours = `${(seconds / 60) / 60}`.split('.')[0];
+	let minutes = `${((seconds / 60) - (hours * 60))}`.split('.')[0];
 
-function getNumberDate() {
-	const timeArray = getCurrentTime();
-	return `${timeArray[1]}/${timeArray[2]}/${timeArray[0]}`;
-}
-
-function getCurrentTime() {
-	const today = new Date();
-	const yyyy = today.getFullYear();
-	const mm = today.getMonth() + 1;
-	const dd = today.getDate();
-	const hh = today.getHours();
-	const min = today.getMinutes();
-	const sec = today.getSeconds();
-	return [yyyy, mm, dd, hh, min, sec];
-}
-
-function timeString(hours, minutes) {
 	let h_s = `${hours} hr`;
 	let m_s = `${minutes} min`;
 
@@ -174,68 +108,169 @@ function timeString(hours, minutes) {
 	if (hours > 1) h_s = `${h_s}s`;
 	if (minutes > 1) m_s = `${m_s}s`;
 
-	return `${h_s} ${m_s}`;
+	global.item.text = `${global.iconString} ${h_s} ${m_s}`;
+	global.item.tooltip = `Time Spent Coding on ${`${global.currentTime()[1]}/${global.currentTime()[2]}/${global.currentTime()[0]}`}`;
 }
 
-function newYearOfTimeJson() {
-	const currentTime = getCurrentTime();
+/**
+ * This function gets the currently saved information and passes it into `global.time`
+ */
+function initializeTimeValues() {
+	let savedTimeJson;
 
-	const empty = {};
-	const months = 12;
-	const days = 31;
-	const filler = {
-		active: 0,
-		graph: [],
-	};
+	try {
+		savedTimeJson = fs.readFileSync(`${__dirname}/../${global.fileDir}/${global.fileName}.json`, 'utf8');
+	} catch (e) {
+		try {
+			fs.mkdirSync(`${__dirname}/../${global.fileDir}/`);
+		} catch (e) {};
+		fs.writeFileSync(`${__dirname}/../${global.fileDir}/${global.fileName}.json`, '{}');
+		savedTimeJson = fs.readFileSync(`${__dirname}/../${global.fileDir}/${global.fileName}.json`, 'utf8');
+	}
 
-	empty[currentTime[0]] = {
-		"months": {}
-	};
+	global.json = checkJson(savedTimeJson);
+}
 
-	for (let i_1 = 1; i_1 < months + 1; i_1++) {
-		empty[currentTime[0]].months[i_1] = {};
-		for (let i_2 = 1; i_2 < days + 1; i_2++) {
-			empty[currentTime[0]].months[i_1][i_2] = filler;
+/**
+ * This function begins the counting process and begins logging active coding time.
+ */
+function initiateCounting() {
+	clearInterval(global.importantInterval);
+	global.importantInterval = setInterval(() => {
+		if (global.isIdle) return;
+		global.json = checkJson(global.json);
+		global.json[global.currentTime()[0]][global.currentTime()[1]][global.currentTime()[2]].active++;
+		if (global.json[global.currentTime()[0]][global.currentTime()[1]][global.currentTime()[2]].active % 60 == 0) {
+			updateBarItem();
+			fs.writeFileSync(`${__dirname}/../${global.fileDir}/${global.fileName}.json`, JSON.stringify(global.json));
+		}
+	}, 1000)
+}
+
+/**
+ * This function runs a series of checks on the current json and fixes any thing it finds.
+ */
+function checkJson(json) {
+	if (typeof json == 'string') json = JSON.parse(json);
+
+	let hasChanged = false;
+	let checkedJson = json;
+	let previous = null;
+
+	if (json[global.currentTime()[0]] == undefined) {
+		checkedJson[global.currentTime()[0]] = {};
+		hasChanged = true;
+	}
+
+	previous = json[global.currentTime()[0]];
+
+	if (previous[global.currentTime()[1]] == undefined) {
+		checkedJson[global.currentTime()[0]][global.currentTime()[1]] = {};
+		hasChanged = true;
+	}
+
+	previous = json[global.currentTime()[0]][global.currentTime()[1]];
+
+	if (previous[global.currentTime()[2]] == undefined) {
+		checkedJson[global.currentTime()[0]][global.currentTime()[1]][global.currentTime()[2]] = {};
+		hasChanged = true;
+	}
+
+	previous = json[global.currentTime()[0]][global.currentTime()[1]][global.currentTime()[2]];
+
+	if (previous.active == undefined) {
+		checkedJson[global.currentTime()[0]][global.currentTime()[1]][global.currentTime()[2]].active = 0;
+		hasChanged = true;
+	}
+
+	if (previous.day == undefined) {
+		let dayKey = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+		checkedJson[global.currentTime()[0]][global.currentTime()[1]][global.currentTime()[2]].day = dayKey[global.currentTime()[6].getDay()];
+		hasChanged = true;
+	}
+
+	if (hasChanged) {
+		fs.writeFileSync(`${__dirname}/../${global.fileDir}/${global.fileName}.json`, JSON.stringify(checkedJson), null, 4);
+	}
+
+	return checkedJson;
+}
+
+/**
+ * This function updates all the global variables to the current settings.
+ */
+function defineCurrentSettings() {
+	global.iconString = vscode.workspace.getConfiguration().get('mimjas-time-tracker.iconStyle');
+	if (global.iconString == '') {
+		global.iconString = 'circuit-board';
+		vscode.workspace.getConfiguration().update('mimjas-time-tracker.iconStyle', 'circuit-board', vscode.ConfigurationTarget.Global);
+	}
+
+	global.iconString = `$(${global.iconString})`;
+
+	if (vscode.workspace.getConfiguration().get('mimjas-time-tracker.labelPosition') == 'Left') {
+		global.labelPosition = vscode.StatusBarAlignment.Left;
+	} else {
+		global.labelPosition = vscode.StatusBarAlignment.Right;
+	}
+
+	if (vscode.workspace.getConfiguration().get('mimjas-time-tracker.labelPriority')) {
+		if (global.labelPosition == vscode.StatusBarAlignment.Right) {
+			global.labelPriority = Infinity;
+		} else {
+			global.labelPriority = -Infinity;
+		}
+	} else {
+		if (global.labelPosition == vscode.StatusBarAlignment.Right) {
+			global.labelPriority = -Infinity;
+		} else {
+			global.labelPriority = Infinity;
 		}
 	}
-
-	global.full = Object.assign({}, global.full, empty);
-	fs.writeFileSync(`${__dirname}/../time-tracker-storage-mimja/time.json`, JSON.stringify(global.full, null, 4));
 }
 
-function updateAllJson(error) {
-	if (error.message == 'year') {
-		newYearOfTimeJson();
-	}
-	if (error.message == 'missing') {
-		let empty = {};
-		for (const key_1 in global.full) {
-			empty[key_1] = {
-				"months": {}
-			};
-			for (const key_2 in global.full[key_1].months) {
-				empty[key_1].months[key_2] = {};
-				for (const key_3 in global.full[key_1].months[key_2]) {
-					empty[key_1].months[key_2][key_3] = {
-						active: (global.full[key_1].months[key_2][key_3].active == undefined) ? 0 : global.full[key_1].months[key_2][key_3].active,
-						graph: (global.full[key_1].months[key_2][key_3].graph == undefined) ? [] : global.full[key_1].months[key_2][key_3].graph,
-					};
-				}
-			}
-		}
+function unIdle(event) {
+	if (global.isIdle) global.isIdle = false;
+	if (!event.focused) return;
 
-		global.full = Object.assign({}, empty);
-		fs.writeFileSync(`${__dirname}/../time-tracker-storage-mimja/time.json`, JSON.stringify(global.full, null, 4));
-	}
-}
-
-var timeout;
-
-function resetIdleTimeout(time) {
-	global.idle = false;
-	clearTimeout(timeout);
-	timeout = setTimeout(() => {
-		global.idle = true;
+	clearTimeout(global.idleTimeout);
+	global.idleTimeout = setTimeout(() => {
+		global.isIdle = true;
 		vscode.window.showInformationMessage('Idle mode has been activated. Time will not be logged until you resume coding.');
-	}, time);
+	}, global.timeTillIdle);
+}
+
+/**
+ * @param {string} filepath 
+ * @returns {string} file type
+ */
+function parse(filepath) {
+	return filepath.substring(filepath.lastIndexOf('.') + 1, filepath.length);
+}
+
+/**
+ * Displays a Cat Image in new Tab, very important.
+ */
+function showCat() {
+	const panel = vscode.window.createWebviewPanel('catCoding', 'Cat Coding', vscode.ViewColumn.One, {});
+	panel.webview.html = `<!DOCTYPE html>
+	<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>Cat Coding - Image</title>
+	</head>
+	<body>
+		<img src="https://media.giphy.com/media/JIX9t2j0ZTN9S/giphy.gif" width="650" />
+	</body>
+	</html>`;
+}
+
+function deactivate() {
+	fs.writeFileSync(`${__dirname}/../${global.fileDir}/${global.fileName}.json`, JSON.stringify(global.json));
+}
+
+module.exports = {
+	activate,
+	deactivate
 }
