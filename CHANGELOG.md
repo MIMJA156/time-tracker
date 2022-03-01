@@ -66,3 +66,6 @@ All Changes made are logged in this file.
 
 ## 1.0.1
 - Bug Fix - All days were off by one
+
+## 1.0.2
+- Disabled graphing due to a bug

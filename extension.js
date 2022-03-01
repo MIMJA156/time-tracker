@@ -69,8 +69,9 @@ function activate(context) {
 
 	//Listen for command input
 	context.subscriptions.push(vscode.commands.registerCommand('mimjas-time-tracker.timeStatuesItemClicked', async () => {
-		let port = bootServer();
-		await open(`http://localhost:${port}`);
+		// let port = bootServer();
+		// await open(`http://localhost:${port}`);
+		vscode.window.showErrorMessage('This feature has been temporarily disabled do to a bug.');
 	}));
 
 	// Initialize the time counting
@@ -229,6 +230,9 @@ function defineCurrentSettings() {
 	}
 }
 
+/**
+ * This function that handles the idle timer.
+ */
 function unIdle(event) {
 	if (global.isIdle) global.isIdle = false;
 	if (!event.focused) return;
