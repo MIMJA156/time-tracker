@@ -1,4 +1,524 @@
-var h=(t,r)=>()=>(r||t((r={exports:{}}).exports,r),r.exports);var b=h((se,I)=>{"use strict";var v=require("fs"),S;function G(){try{return v.statSync("/.dockerenv"),!0}catch{return!1}}function X(){try{return v.readFileSync("/proc/self/cgroup","utf8").includes("docker")}catch{return!1}}I.exports=()=>(S===void 0&&(S=G()||X()),S)});var F=h((ae,P)=>{"use strict";var V=require("os"),K=require("fs"),D=b(),A=()=>{if(process.platform!=="linux")return!1;if(V.release().toLowerCase().includes("microsoft"))return!D();try{return K.readFileSync("/proc/version","utf8").toLowerCase().includes("microsoft")?!D():!1}catch{return!1}};process.env.__IS_WSL_TEST__?P.exports=A:P.exports=A()});var O=h((ce,E)=>{"use strict";E.exports=(t,r,i)=>{let o=n=>Object.defineProperty(t,r,{value:n,enumerable:!0,writable:!0});return Object.defineProperty(t,r,{configurable:!0,enumerable:!0,get(){let n=i();return o(n),n},set(n){o(n)}}),t}});var J=h((le,B)=>{var Y=require("path"),H=require("child_process"),{promises:$,constants:W}=require("fs"),w=F(),U=b(),x=O(),j=Y.join(__dirname,"xdg-open"),{platform:g,arch:N}=process,Z=(()=>{let t="/mnt/",r;return async function(){if(r)return r;let i="/etc/wsl.conf",o=!1;try{await $.access(i,W.F_OK),o=!0}catch{}if(!o)return t;let n=await $.readFile(i,{encoding:"utf8"}),c=/(?<!#.*)root\s*=\s*(?<mountPoint>.*)/g.exec(n);return c?(r=c.groups.mountPoint.trim(),r=r.endsWith("/")?r:`${r}/`,r):t}})(),q=async(t,r)=>{let i;for(let o of t)try{return await r(o)}catch(n){i=n}throw i},y=async t=>{if(t={wait:!1,background:!1,newInstance:!1,allowNonzeroExitCode:!1,...t},Array.isArray(t.app))return q(t.app,l=>y({...t,app:l}));let{name:r,arguments:i=[]}=t.app||{};if(i=[...i],Array.isArray(r))return q(r,l=>y({...t,app:{name:l,arguments:i}}));let o,n=[],c={};if(g==="darwin")o="open",t.wait&&n.push("--wait-apps"),t.background&&n.push("--background"),t.newInstance&&n.push("--new"),r&&n.push("-a",r);else if(g==="win32"||w&&!U()){let l=await Z();o=w?`${l}c/Windows/System32/WindowsPowerShell/v1.0/powershell.exe`:`${process.env.SYSTEMROOT}\\System32\\WindowsPowerShell\\v1.0\\powershell`,n.push("-NoProfile","-NonInteractive","\u2013ExecutionPolicy","Bypass","-EncodedCommand"),w||(c.windowsVerbatimArguments=!0);let a=["Start"];t.wait&&a.push("-Wait"),r?(a.push(`"\`"${r}\`""`,"-ArgumentList"),t.target&&i.unshift(t.target)):t.target&&a.push(`"${t.target}"`),i.length>0&&(i=i.map(p=>`"\`"${p}\`""`),a.push(i.join(","))),t.target=Buffer.from(a.join(" "),"utf16le").toString("base64")}else{if(r)o=r;else{let l=!__dirname||__dirname==="/",a=!1;try{await $.access(j,W.X_OK),a=!0}catch{}o=process.versions.electron||g==="android"||l||!a?"xdg-open":j}i.length>0&&n.push(...i),t.wait||(c.stdio="ignore",c.detached=!0)}t.target&&n.push(t.target),g==="darwin"&&i.length>0&&n.push("--args",...i);let d=H.spawn(o,n,c);return t.wait?new Promise((l,a)=>{d.once("error",a),d.once("close",p=>{if(t.allowNonzeroExitCode&&p>0){a(new Error(`Exited with code ${p}`));return}l(d)})}):(d.unref(),d)},C=(t,r)=>{if(typeof t!="string")throw new TypeError("Expected a `target`");return y({...r,target:t})},Q=(t,r)=>{if(typeof t!="string")throw new TypeError("Expected a `name`");let{arguments:i=[]}=r||{};if(i!=null&&!Array.isArray(i))throw new TypeError("Expected `appArguments` as Array type");return y({...r,app:{name:t,arguments:i}})};function M(t){if(typeof t=="string"||Array.isArray(t))return t;let{[N]:r}=t;if(!r)throw new Error(`${N} is not supported`);return r}function k({[g]:t},{wsl:r}){if(r&&w)return M(r);if(!t)throw new Error(`${g} is not supported`);return M(t)}var T={};x(T,"chrome",()=>k({darwin:"google chrome",win32:"chrome",linux:["google-chrome","google-chrome-stable","chromium"]},{wsl:{ia32:"/mnt/c/Program Files (x86)/Google/Chrome/Application/chrome.exe",x64:["/mnt/c/Program Files/Google/Chrome/Application/chrome.exe","/mnt/c/Program Files (x86)/Google/Chrome/Application/chrome.exe"]}}));x(T,"firefox",()=>k({darwin:"firefox",win32:"C:\\Program Files\\Mozilla Firefox\\firefox.exe",linux:"firefox"},{wsl:"/mnt/c/Program Files/Mozilla Firefox/firefox.exe"}));x(T,"edge",()=>k({darwin:"microsoft edge",win32:"msedge",linux:["microsoft-edge","microsoft-edge-dev"]},{wsl:"/mnt/c/Program Files (x86)/Microsoft/Edge/Application/msedge.exe"}));C.apps=T;C.openApp=Q;B.exports=C});var L=h(()=>{});var s=require("vscode"),f=require("fs"),de=J(),fe=L(),e={},u={};e.json={};e.isIdle=!1;e.minutesInADay=1440;e.timeTillIdle=5*60*1e3;e.fileDir="time-tracker-storage-mimja";e.fileName="time.mim";e.idleTimeout=null;module.exports.extensionGlobals=e;e.currentTime=()=>{let t=new Date,r=t.getFullYear(),i=t.getMonth()+1,o=t.getDate(),n=t.getHours(),c=t.getMinutes(),d=t.getSeconds();return[r,i,o,n,c,d,t]};function ee(t){R(),u.labelPosition=e.labelPosition,u.labelPriority=e.labelPriority,u.iconString=e.iconString,s.workspace.onDidChangeConfiguration(()=>{R(),(e.labelPosition!==u.labelPosition||e.labelPriority!==u.labelPriority)&&s.window.showInformationMessage("Reload VSCode to see the changes.","Reload").then(i=>{i=="Reload"&&s.commands.executeCommand("workbench.action.reloadWindow")}),e.iconString!==u.iconString&&_(),u.labelPosition=e.labelPosition,u.labelPriority=e.labelPriority,u.iconString=e.iconString}),e.item=s.window.createStatusBarItem(e.labelPosition,e.labelPriority),e.item.command="mimjas-time-tracker.timeStatuesItemClicked",t.subscriptions.push(e.item),e.item.show(),t.subscriptions.push(s.commands.registerCommand("mimjas-time-tracker.timeStatuesItemClicked",async()=>{s.window.showErrorMessage("This feature has been temporarily disabled do to a bug.")})),te(),_(),ie(),m(69),s.workspace.onDidChangeTextDocument(i=>m(i)),s.workspace.onDidCreateFiles(i=>m(i)),s.workspace.onDidDeleteFiles(i=>m(i)),s.workspace.onDidRenameFiles(i=>m(i)),s.window.onDidOpenTerminal(i=>m(i)),s.window.onDidCloseTerminal(i=>m(i)),s.window.onDidChangeWindowState(i=>m(i));let r="mimjas-time-tracker.showCat";t.subscriptions.push(s.commands.registerCommand(r,re))}function _(){let t=e.json[e.currentTime()[0]][e.currentTime()[1]][e.currentTime()[2]].active,r=`${t/60/60}`.split(".")[0],i=`${t/60-r*60}`.split(".")[0],o=`${r} hr`,n=`${i} min`;r<=0&&(o=""),i<=0&&(n=""),r>1&&(o=`${o}s`),i>1&&(n=`${n}s`),e.item.text=`${e.iconString} ${o} ${n}`,e.item.tooltip=`Time Spent Coding on ${`${e.currentTime()[1]}/${e.currentTime()[2]}/${e.currentTime()[0]}`}`}function te(){let t;try{t=f.readFileSync(`${__dirname}/../../${e.fileDir}/${e.fileName}.json`,"utf8")}catch{try{f.mkdirSync(`${__dirname}/../../${e.fileDir}/`)}catch{}f.writeFileSync(`${__dirname}/../../${e.fileDir}/${e.fileName}.json`,"{}"),t=f.readFileSync(`${__dirname}/../../${e.fileDir}/${e.fileName}.json`,"utf8")}e.json=z(t)}function ie(){clearInterval(e.importantInterval),e.importantInterval=setInterval(()=>{e.isIdle||(e.json=z(e.json),e.json[e.currentTime()[0]][e.currentTime()[1]][e.currentTime()[2]].active++,e.json[e.currentTime()[0]][e.currentTime()[1]][e.currentTime()[2]].active%60==0&&(_(),f.writeFileSync(`${__dirname}/../../${e.fileDir}/${e.fileName}.json`,JSON.stringify(e.json))))},1e3)}function z(t){typeof t=="string"&&(t=JSON.parse(t));let r=!1,i=t,o=null;if(t[e.currentTime()[0]]==null&&(i[e.currentTime()[0]]={},r=!0),o=t[e.currentTime()[0]],o[e.currentTime()[1]]==null&&(i[e.currentTime()[0]][e.currentTime()[1]]={},r=!0),o=t[e.currentTime()[0]][e.currentTime()[1]],o[e.currentTime()[2]]==null&&(i[e.currentTime()[0]][e.currentTime()[1]][e.currentTime()[2]]={},r=!0),o=t[e.currentTime()[0]][e.currentTime()[1]][e.currentTime()[2]],o.active==null&&(i[e.currentTime()[0]][e.currentTime()[1]][e.currentTime()[2]].active=0,r=!0),o.day==null){let n=["sunday","monday","tuesday","wednesday","thursday","friday","saturday"];i[e.currentTime()[0]][e.currentTime()[1]][e.currentTime()[2]].day=n[e.currentTime()[6].getDay()],r=!0}return r&&f.writeFileSync(`${__dirname}/../../${e.fileDir}/${e.fileName}.json`,JSON.stringify(i),null,4),i}function R(){e.iconString=s.workspace.getConfiguration().get("mimjas-time-tracker.iconStyle"),e.iconString==""&&(e.iconString="circuit-board",s.workspace.getConfiguration().update("mimjas-time-tracker.iconStyle","circuit-board",s.ConfigurationTarget.Global)),e.iconString=`$(${e.iconString})`,s.workspace.getConfiguration().get("mimjas-time-tracker.labelPosition")=="Left"?e.labelPosition=s.StatusBarAlignment.Left:e.labelPosition=s.StatusBarAlignment.Right,s.workspace.getConfiguration().get("mimjas-time-tracker.labelPriority")?e.labelPosition==s.StatusBarAlignment.Right?e.labelPriority=1/0:e.labelPriority=-1/0:e.labelPosition==s.StatusBarAlignment.Right?e.labelPriority=-1/0:e.labelPriority=1/0}function m(t){e.isIdle&&(e.isIdle=!1),!!t.focused&&(clearTimeout(e.idleTimeout),e.idleTimeout=setTimeout(()=>{e.isIdle=!0,s.window.showInformationMessage("Idle mode has been activated. Time will not be logged until you resume coding.")},e.timeTillIdle))}function re(){let t=s.window.createWebviewPanel("catCoding","Cat Coding",s.ViewColumn.One,{});t.webview.html=`<!DOCTYPE html>
+var __getOwnPropNames = Object.getOwnPropertyNames;
+var __commonJS = (cb, mod) => function __require() {
+  return mod || (0, cb[__getOwnPropNames(cb)[0]])((mod = { exports: {} }).exports, mod), mod.exports;
+};
+
+// node_modules/is-docker/index.js
+var require_is_docker = __commonJS({
+  "node_modules/is-docker/index.js"(exports2, module2) {
+    "use strict";
+    var fs2 = require("fs");
+    var isDocker;
+    function hasDockerEnv() {
+      try {
+        fs2.statSync("/.dockerenv");
+        return true;
+      } catch (_) {
+        return false;
+      }
+    }
+    function hasDockerCGroup() {
+      try {
+        return fs2.readFileSync("/proc/self/cgroup", "utf8").includes("docker");
+      } catch (_) {
+        return false;
+      }
+    }
+    module2.exports = () => {
+      if (isDocker === void 0) {
+        isDocker = hasDockerEnv() || hasDockerCGroup();
+      }
+      return isDocker;
+    };
+  }
+});
+
+// node_modules/is-wsl/index.js
+var require_is_wsl = __commonJS({
+  "node_modules/is-wsl/index.js"(exports2, module2) {
+    "use strict";
+    var os = require("os");
+    var fs2 = require("fs");
+    var isDocker = require_is_docker();
+    var isWsl = () => {
+      if (process.platform !== "linux") {
+        return false;
+      }
+      if (os.release().toLowerCase().includes("microsoft")) {
+        if (isDocker()) {
+          return false;
+        }
+        return true;
+      }
+      try {
+        return fs2.readFileSync("/proc/version", "utf8").toLowerCase().includes("microsoft") ? !isDocker() : false;
+      } catch (_) {
+        return false;
+      }
+    };
+    if (process.env.__IS_WSL_TEST__) {
+      module2.exports = isWsl;
+    } else {
+      module2.exports = isWsl();
+    }
+  }
+});
+
+// node_modules/define-lazy-prop/index.js
+var require_define_lazy_prop = __commonJS({
+  "node_modules/define-lazy-prop/index.js"(exports2, module2) {
+    "use strict";
+    module2.exports = (object, propertyName, fn) => {
+      const define = (value) => Object.defineProperty(object, propertyName, { value, enumerable: true, writable: true });
+      Object.defineProperty(object, propertyName, {
+        configurable: true,
+        enumerable: true,
+        get() {
+          const result = fn();
+          define(result);
+          return result;
+        },
+        set(value) {
+          define(value);
+        }
+      });
+      return object;
+    };
+  }
+});
+
+// node_modules/open/index.js
+var require_open = __commonJS({
+  "node_modules/open/index.js"(exports2, module2) {
+    var path = require("path");
+    var childProcess = require("child_process");
+    var { promises: fs2, constants: fsConstants } = require("fs");
+    var isWsl = require_is_wsl();
+    var isDocker = require_is_docker();
+    var defineLazyProperty = require_define_lazy_prop();
+    var localXdgOpenPath = path.join(__dirname, "xdg-open");
+    var { platform, arch } = process;
+    var getWslDrivesMountPoint = (() => {
+      const defaultMountPoint = "/mnt/";
+      let mountPoint;
+      return async function() {
+        if (mountPoint) {
+          return mountPoint;
+        }
+        const configFilePath = "/etc/wsl.conf";
+        let isConfigFileExists = false;
+        try {
+          await fs2.access(configFilePath, fsConstants.F_OK);
+          isConfigFileExists = true;
+        } catch {
+        }
+        if (!isConfigFileExists) {
+          return defaultMountPoint;
+        }
+        const configContent = await fs2.readFile(configFilePath, { encoding: "utf8" });
+        const configMountPoint = /(?<!#.*)root\s*=\s*(?<mountPoint>.*)/g.exec(configContent);
+        if (!configMountPoint) {
+          return defaultMountPoint;
+        }
+        mountPoint = configMountPoint.groups.mountPoint.trim();
+        mountPoint = mountPoint.endsWith("/") ? mountPoint : `${mountPoint}/`;
+        return mountPoint;
+      };
+    })();
+    var pTryEach = async (array, mapper) => {
+      let latestError;
+      for (const item of array) {
+        try {
+          return await mapper(item);
+        } catch (error) {
+          latestError = error;
+        }
+      }
+      throw latestError;
+    };
+    var baseOpen = async (options) => {
+      options = {
+        wait: false,
+        background: false,
+        newInstance: false,
+        allowNonzeroExitCode: false,
+        ...options
+      };
+      if (Array.isArray(options.app)) {
+        return pTryEach(options.app, (singleApp) => baseOpen({
+          ...options,
+          app: singleApp
+        }));
+      }
+      let { name: app, arguments: appArguments = [] } = options.app || {};
+      appArguments = [...appArguments];
+      if (Array.isArray(app)) {
+        return pTryEach(app, (appName) => baseOpen({
+          ...options,
+          app: {
+            name: appName,
+            arguments: appArguments
+          }
+        }));
+      }
+      let command;
+      const cliArguments = [];
+      const childProcessOptions = {};
+      if (platform === "darwin") {
+        command = "open";
+        if (options.wait) {
+          cliArguments.push("--wait-apps");
+        }
+        if (options.background) {
+          cliArguments.push("--background");
+        }
+        if (options.newInstance) {
+          cliArguments.push("--new");
+        }
+        if (app) {
+          cliArguments.push("-a", app);
+        }
+      } else if (platform === "win32" || isWsl && !isDocker()) {
+        const mountPoint = await getWslDrivesMountPoint();
+        command = isWsl ? `${mountPoint}c/Windows/System32/WindowsPowerShell/v1.0/powershell.exe` : `${process.env.SYSTEMROOT}\\System32\\WindowsPowerShell\\v1.0\\powershell`;
+        cliArguments.push("-NoProfile", "-NonInteractive", "\u2013ExecutionPolicy", "Bypass", "-EncodedCommand");
+        if (!isWsl) {
+          childProcessOptions.windowsVerbatimArguments = true;
+        }
+        const encodedArguments = ["Start"];
+        if (options.wait) {
+          encodedArguments.push("-Wait");
+        }
+        if (app) {
+          encodedArguments.push(`"\`"${app}\`""`, "-ArgumentList");
+          if (options.target) {
+            appArguments.unshift(options.target);
+          }
+        } else if (options.target) {
+          encodedArguments.push(`"${options.target}"`);
+        }
+        if (appArguments.length > 0) {
+          appArguments = appArguments.map((arg) => `"\`"${arg}\`""`);
+          encodedArguments.push(appArguments.join(","));
+        }
+        options.target = Buffer.from(encodedArguments.join(" "), "utf16le").toString("base64");
+      } else {
+        if (app) {
+          command = app;
+        } else {
+          const isBundled = !__dirname || __dirname === "/";
+          let exeLocalXdgOpen = false;
+          try {
+            await fs2.access(localXdgOpenPath, fsConstants.X_OK);
+            exeLocalXdgOpen = true;
+          } catch {
+          }
+          const useSystemXdgOpen = process.versions.electron || platform === "android" || isBundled || !exeLocalXdgOpen;
+          command = useSystemXdgOpen ? "xdg-open" : localXdgOpenPath;
+        }
+        if (appArguments.length > 0) {
+          cliArguments.push(...appArguments);
+        }
+        if (!options.wait) {
+          childProcessOptions.stdio = "ignore";
+          childProcessOptions.detached = true;
+        }
+      }
+      if (options.target) {
+        cliArguments.push(options.target);
+      }
+      if (platform === "darwin" && appArguments.length > 0) {
+        cliArguments.push("--args", ...appArguments);
+      }
+      const subprocess = childProcess.spawn(command, cliArguments, childProcessOptions);
+      if (options.wait) {
+        return new Promise((resolve, reject) => {
+          subprocess.once("error", reject);
+          subprocess.once("close", (exitCode) => {
+            if (options.allowNonzeroExitCode && exitCode > 0) {
+              reject(new Error(`Exited with code ${exitCode}`));
+              return;
+            }
+            resolve(subprocess);
+          });
+        });
+      }
+      subprocess.unref();
+      return subprocess;
+    };
+    var open2 = (target, options) => {
+      if (typeof target !== "string") {
+        throw new TypeError("Expected a `target`");
+      }
+      return baseOpen({
+        ...options,
+        target
+      });
+    };
+    var openApp = (name, options) => {
+      if (typeof name !== "string") {
+        throw new TypeError("Expected a `name`");
+      }
+      const { arguments: appArguments = [] } = options || {};
+      if (appArguments !== void 0 && appArguments !== null && !Array.isArray(appArguments)) {
+        throw new TypeError("Expected `appArguments` as Array type");
+      }
+      return baseOpen({
+        ...options,
+        app: {
+          name,
+          arguments: appArguments
+        }
+      });
+    };
+    function detectArchBinary(binary) {
+      if (typeof binary === "string" || Array.isArray(binary)) {
+        return binary;
+      }
+      const { [arch]: archBinary } = binary;
+      if (!archBinary) {
+        throw new Error(`${arch} is not supported`);
+      }
+      return archBinary;
+    }
+    function detectPlatformBinary({ [platform]: platformBinary }, { wsl }) {
+      if (wsl && isWsl) {
+        return detectArchBinary(wsl);
+      }
+      if (!platformBinary) {
+        throw new Error(`${platform} is not supported`);
+      }
+      return detectArchBinary(platformBinary);
+    }
+    var apps = {};
+    defineLazyProperty(apps, "chrome", () => detectPlatformBinary({
+      darwin: "google chrome",
+      win32: "chrome",
+      linux: ["google-chrome", "google-chrome-stable", "chromium"]
+    }, {
+      wsl: {
+        ia32: "/mnt/c/Program Files (x86)/Google/Chrome/Application/chrome.exe",
+        x64: ["/mnt/c/Program Files/Google/Chrome/Application/chrome.exe", "/mnt/c/Program Files (x86)/Google/Chrome/Application/chrome.exe"]
+      }
+    }));
+    defineLazyProperty(apps, "firefox", () => detectPlatformBinary({
+      darwin: "firefox",
+      win32: "C:\\Program Files\\Mozilla Firefox\\firefox.exe",
+      linux: "firefox"
+    }, {
+      wsl: "/mnt/c/Program Files/Mozilla Firefox/firefox.exe"
+    }));
+    defineLazyProperty(apps, "edge", () => detectPlatformBinary({
+      darwin: "microsoft edge",
+      win32: "msedge",
+      linux: ["microsoft-edge", "microsoft-edge-dev"]
+    }, {
+      wsl: "/mnt/c/Program Files (x86)/Microsoft/Edge/Application/msedge.exe"
+    }));
+    open2.apps = apps;
+    open2.openApp = openApp;
+    module2.exports = open2;
+  }
+});
+
+// src/server.js
+var require_server = __commonJS({
+  "src/server.js"() {
+  }
+});
+
+// src/extension.js
+var vscode = require("vscode");
+var fs = require("fs");
+var open = require_open();
+var bootServer = require_server();
+var global = {};
+var cache = {};
+global.json = {};
+global.isIdle = false;
+global.minutesInADay = 1440;
+global.timeTillIdle = 5 * 60 * 1e3;
+global.fileDir = "time-tracker-storage-mimja";
+global.fileName = "time.mim";
+global.idleTimeout = null;
+module.exports.extensionGlobals = global;
+global.currentTime = () => {
+  const today = new Date();
+  const yyyy = today.getFullYear();
+  const mm = today.getMonth() + 1;
+  const dd = today.getDate();
+  const hh = today.getHours();
+  const min = today.getMinutes();
+  const sec = today.getSeconds();
+  return [yyyy, mm, dd, hh, min, sec, today];
+};
+function activate(context) {
+  defineCurrentSettings();
+  cache.labelPosition = global.labelPosition;
+  cache.labelPriority = global.labelPriority;
+  cache.iconString = global.iconString;
+  vscode.workspace.onDidChangeConfiguration(() => {
+    defineCurrentSettings();
+    unIdle(null);
+    if (global.labelPosition !== cache.labelPosition || global.labelPriority !== cache.labelPriority) {
+      vscode.window.showInformationMessage("Reload VSCode to see the changes.", "Reload").then((selection) => {
+        if (selection == "Reload") {
+          vscode.commands.executeCommand("workbench.action.reloadWindow");
+        }
+      });
+    }
+    if (global.iconString !== cache.iconString) {
+      updateBarItem();
+    }
+    cache.labelPosition = global.labelPosition;
+    cache.labelPriority = global.labelPriority;
+    cache.iconString = global.iconString;
+  });
+  global.item = vscode.window.createStatusBarItem(global.labelPosition, global.labelPriority);
+  global.item.command = "mimjas-time-tracker.timeStatuesItemClicked";
+  context.subscriptions.push(global.item);
+  global.item.show();
+  context.subscriptions.push(vscode.commands.registerCommand("mimjas-time-tracker.timeStatuesItemClicked", showOnWeb));
+  initializeTimeValues();
+  updateBarItem();
+  initiateCounting();
+  unIdle(69);
+  vscode.workspace.onDidChangeTextDocument((changeEvent) => unIdle(changeEvent));
+  vscode.workspace.onDidCreateFiles((createEvent) => unIdle(createEvent));
+  vscode.workspace.onDidDeleteFiles((deleteEvent) => unIdle(deleteEvent));
+  vscode.workspace.onDidRenameFiles((renameEvent) => unIdle(renameEvent));
+  vscode.window.onDidOpenTerminal((terminal) => unIdle(terminal));
+  vscode.window.onDidCloseTerminal((terminal) => unIdle(terminal));
+  vscode.window.onDidChangeWindowState((state) => unIdle(state));
+  const showCatCommand = "mimjas-time-tracker.showCat";
+  const showGraphCommand = "mimjas-time-tracker.showOnWeb";
+  context.subscriptions.push(vscode.commands.registerCommand(showCatCommand, showCat));
+  context.subscriptions.push(vscode.commands.registerCommand(showGraphCommand, showOnWeb));
+}
+function showOnWeb() {
+  vscode.window.showErrorMessage("This feature has been temporarily disabled do to a bug.");
+}
+function updateBarItem() {
+  let seconds = global.json[global.currentTime()[0]][global.currentTime()[1]][global.currentTime()[2]].active;
+  let hours = `${seconds / 60 / 60}`.split(".")[0];
+  let minutes = `${seconds / 60 - hours * 60}`.split(".")[0];
+  let h_s = `${hours} hr`;
+  let m_s = `${minutes} min`;
+  if (hours <= 0)
+    h_s = "";
+  if (minutes <= 0)
+    m_s = "";
+  if (hours > 1)
+    h_s = `${h_s}s`;
+  if (minutes > 1)
+    m_s = `${m_s}s`;
+  global.item.text = `${global.iconString} ${h_s} ${m_s}`;
+  global.item.tooltip = `Time Spent Coding on ${`${global.currentTime()[1]}/${global.currentTime()[2]}/${global.currentTime()[0]}`}`;
+}
+function initializeTimeValues() {
+  let savedTimeJson;
+  try {
+    savedTimeJson = fs.readFileSync(`${__dirname}/../../${global.fileDir}/${global.fileName}.json`, "utf8");
+  } catch (e) {
+    try {
+      fs.mkdirSync(`${__dirname}/../../${global.fileDir}/`);
+    } catch (e2) {
+    }
+    ;
+    fs.writeFileSync(`${__dirname}/../../${global.fileDir}/${global.fileName}.json`, "{}");
+    savedTimeJson = fs.readFileSync(`${__dirname}/../../${global.fileDir}/${global.fileName}.json`, "utf8");
+  }
+  global.json = checkJson(savedTimeJson);
+}
+function initiateCounting() {
+  clearInterval(global.importantInterval);
+  global.importantInterval = setInterval(() => {
+    if (global.isIdle)
+      return;
+    global.json = checkJson(global.json);
+    global.json[global.currentTime()[0]][global.currentTime()[1]][global.currentTime()[2]].active++;
+    if (global.json[global.currentTime()[0]][global.currentTime()[1]][global.currentTime()[2]].active % 60 == 0) {
+      updateBarItem();
+      fs.writeFileSync(`${__dirname}/../../${global.fileDir}/${global.fileName}.json`, JSON.stringify(global.json));
+    }
+  }, 1e3);
+}
+function checkJson(json) {
+  if (typeof json == "string")
+    json = JSON.parse(json);
+  let hasChanged = false;
+  let checkedJson = json;
+  let previous = null;
+  if (json[global.currentTime()[0]] == void 0) {
+    checkedJson[global.currentTime()[0]] = {};
+    hasChanged = true;
+  }
+  previous = json[global.currentTime()[0]];
+  if (previous[global.currentTime()[1]] == void 0) {
+    checkedJson[global.currentTime()[0]][global.currentTime()[1]] = {};
+    hasChanged = true;
+  }
+  previous = json[global.currentTime()[0]][global.currentTime()[1]];
+  if (previous[global.currentTime()[2]] == void 0) {
+    checkedJson[global.currentTime()[0]][global.currentTime()[1]][global.currentTime()[2]] = {};
+    hasChanged = true;
+  }
+  previous = json[global.currentTime()[0]][global.currentTime()[1]][global.currentTime()[2]];
+  if (previous.active == void 0) {
+    checkedJson[global.currentTime()[0]][global.currentTime()[1]][global.currentTime()[2]].active = 0;
+    hasChanged = true;
+  }
+  if (previous.day == void 0) {
+    let dayKey = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
+    checkedJson[global.currentTime()[0]][global.currentTime()[1]][global.currentTime()[2]].day = dayKey[global.currentTime()[6].getDay()];
+    hasChanged = true;
+  }
+  if (hasChanged) {
+    fs.writeFileSync(`${__dirname}/../../${global.fileDir}/${global.fileName}.json`, JSON.stringify(checkedJson), null, 4);
+  }
+  return checkedJson;
+}
+function defineCurrentSettings() {
+  global.iconString = vscode.workspace.getConfiguration().get("mimjas-time-tracker.iconStyle");
+  if (global.iconString == "") {
+    global.iconString = "circuit-board";
+    vscode.workspace.getConfiguration().update("mimjas-time-tracker.iconStyle", "circuit-board", vscode.ConfigurationTarget.Global);
+  }
+  global.iconString = `$(${global.iconString})`;
+  if (vscode.workspace.getConfiguration().get("mimjas-time-tracker.labelPosition") == "Left") {
+    global.labelPosition = vscode.StatusBarAlignment.Left;
+  } else {
+    global.labelPosition = vscode.StatusBarAlignment.Right;
+  }
+  if (vscode.workspace.getConfiguration().get("mimjas-time-tracker.labelPriority")) {
+    if (global.labelPosition == vscode.StatusBarAlignment.Right) {
+      global.labelPriority = Infinity;
+    } else {
+      global.labelPriority = -Infinity;
+    }
+  } else {
+    if (global.labelPosition == vscode.StatusBarAlignment.Right) {
+      global.labelPriority = -Infinity;
+    } else {
+      global.labelPriority = Infinity;
+    }
+  }
+  global.timeTillIdle = vscode.workspace.getConfiguration().get("mimjas-time-tracker.timeTillIdle") * 1e3 * 60;
+}
+function unIdle(event) {
+  if (global.isIdle)
+    global.isIdle = false;
+  if (event != null && !event.focused)
+    return;
+  clearTimeout(global.idleTimeout);
+  global.idleTimeout = setTimeout(() => {
+    global.isIdle = true;
+    vscode.window.showInformationMessage("Idle mode has been activated. Time will not be logged until you resume coding.");
+  }, global.timeTillIdle);
+}
+function showCat() {
+  const panel = vscode.window.createWebviewPanel("catCoding", "Cat Coding", vscode.ViewColumn.One, {});
+  panel.webview.html = `<!DOCTYPE html>
 	<html lang="en">
 	<head>
 		<meta charset="UTF-8">
@@ -8,4 +528,13 @@ var h=(t,r)=>()=>(r||t((r={exports:{}}).exports,r),r.exports);var b=h((se,I)=>{"
 	<body>
 		<img src="https://media.giphy.com/media/JIX9t2j0ZTN9S/giphy.gif" width="650" />
 	</body>
-	</html>`}function ne(){f.writeFileSync(`${__dirname}/../../${e.fileDir}/${e.fileName}.json`,JSON.stringify(e.json))}module.exports={activate:ee,deactivate:ne};
+	</html>`;
+}
+function deactivate() {
+  fs.writeFileSync(`${__dirname}/../../${global.fileDir}/${global.fileName}.json`, JSON.stringify(global.json));
+}
+module.exports = {
+  activate,
+  deactivate
+};
+//# sourceMappingURL=main.js.map

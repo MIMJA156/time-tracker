@@ -3,7 +3,7 @@
   "name": "time-tracker-app",
   "displayName": "Mimjas Time Tracker",
   "description": "Logs the amount of time you spend coding.",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "publisher": "MIMJA156",
   "repository": {
     "type": "git",
@@ -34,7 +34,12 @@
   "contributes": {
     "commands": [{
       "command": "mimjas-time-tracker.showCat",
-      "title": "Show the Fabled Cat GIF"
+      "title": "Show the Fabled Cat GIF",
+      "category": "Time Tracker"
+    }, {
+      "command": "mimjas-time-tracker.showOnWeb",
+      "title": "Show Time on the Web",
+      "category": "Time Tracker"
     }],
     "configuration": [{
       "title": "Mimjas Time Tracker",
@@ -57,6 +62,11 @@
         "mimjas-time-tracker.labelPriority": {
           "type": "boolean",
           "description": "Will be more towards the center of the statues bar when on."
+        },
+        "mimjas-time-tracker.timeTillIdle": {
+          "type": "number",
+          "default": "5",
+          "description": "The amount of time in minutes before the time tracker will idle."
         }
       }
     }]

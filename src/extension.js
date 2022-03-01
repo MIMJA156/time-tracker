@@ -43,6 +43,7 @@ function activate(context) {
 
 	vscode.workspace.onDidChangeConfiguration(() => {
 		defineCurrentSettings();
+		unIdle(null);
 
 		if (global.labelPosition !== cache.labelPosition || global.labelPriority !== cache.labelPriority) {
 			vscode.window.showInformationMessage('Reload VSCode to see the changes.', 'Reload').then(selection => {
@@ -67,12 +68,8 @@ function activate(context) {
 	context.subscriptions.push(global.item);
 	global.item.show();
 
-	//Listen for command input
-	context.subscriptions.push(vscode.commands.registerCommand('mimjas-time-tracker.timeStatuesItemClicked', async () => {
-		// let port = bootServer();
-		// await open(`http://localhost:${port}`);
-		vscode.window.showErrorMessage('This feature has been temporarily disabled do to a bug.');
-	}));
+	//Listen for click on the time logger item in the status bar
+	context.subscriptions.push(vscode.commands.registerCommand('mimjas-time-tracker.timeStatuesItemClicked', showOnWeb));
 
 	// Initialize the time counting
 	initializeTimeValues();
@@ -90,9 +87,17 @@ function activate(context) {
 	vscode.window.onDidChangeWindowState(state => unIdle(state));
 
 	//Create any random commands.
-	const command = 'mimjas-time-tracker.showCat';
+	const showCatCommand = 'mimjas-time-tracker.showCat';
+	const showGraphCommand = 'mimjas-time-tracker.showOnWeb';
 
-	context.subscriptions.push(vscode.commands.registerCommand(command, showCat));
+	context.subscriptions.push(vscode.commands.registerCommand(showCatCommand, showCat));
+	context.subscriptions.push(vscode.commands.registerCommand(showGraphCommand, showOnWeb));
+}
+
+function showOnWeb() {
+	// let port = bootServer();
+	// await open(`http://localhost:${port}`);
+	vscode.window.showErrorMessage('This feature has been temporarily disabled do to a bug.');
 }
 
 function updateBarItem() {
@@ -228,6 +233,8 @@ function defineCurrentSettings() {
 			global.labelPriority = Infinity;
 		}
 	}
+
+	global.timeTillIdle = vscode.workspace.getConfiguration().get('mimjas-time-tracker.timeTillIdle') * 1000 * 60;
 }
 
 /**
@@ -235,7 +242,7 @@ function defineCurrentSettings() {
  */
 function unIdle(event) {
 	if (global.isIdle) global.isIdle = false;
-	if (!event.focused) return;
+	if (event != null && !event.focused) return;
 
 	clearTimeout(global.idleTimeout);
 	global.idleTimeout = setTimeout(() => {

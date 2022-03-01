@@ -72,3 +72,6 @@ All Changes made are logged in this file.
 
 ## 1.0.5
 - Minified the code to decrease boot time
+
+## 1.0.6
+- Added more settings and commands
