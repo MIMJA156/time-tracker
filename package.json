@@ -3,7 +3,7 @@
   "name": "time-tracker-app",
   "displayName": "Mimjas Time Tracker",
   "description": "Logs the amount of time you spend coding.",
-  "version": "1.0.2",
+  "version": "1.0.5",
   "publisher": "MIMJA156",
   "repository": {
     "type": "git",
@@ -12,13 +12,20 @@
   "engines": {
     "vscode": "^1.63.0"
   },
+  "scripts": {
+    "vscode:prepublish": "npm run esbuild-base -- --minify",
+    "esbuild-base": "esbuild ./src/extension.js --bundle --outfile=out/main.js --external:vscode --format=cjs --platform=node",
+    "esbuild": "npm run esbuild-base -- --sourcemap",
+    "esbuild-watch": "npm run esbuild-base -- --sourcemap --watch",
+    "test-compile": "tsc -p ./"
+  },
   "categories": [
     "Other"
   ],
   "activationEvents": [
     "onStartupFinished"
   ],
-  "main": "./extension.js",
+  "main": "./out/main.js",
   "capabilities": {
     "untrustedWorkspaces": {
       "supported": true
@@ -55,6 +62,7 @@
     }]
   },
   "devDependencies": {
+    "esbuild": "^0.14.23",
     "eslint": "^8.6.0"
   },
   "dependencies": {

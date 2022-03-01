@@ -69,3 +69,6 @@ All Changes made are logged in this file.
 
 ## 1.0.2
 - Disabled graphing due to a bug
+
+## 1.0.5
+- Minified the code to decrease boot time
