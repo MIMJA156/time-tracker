@@ -94,10 +94,9 @@ function activate(context) {
 	context.subscriptions.push(vscode.commands.registerCommand(showGraphCommand, showOnWeb));
 }
 
-function showOnWeb() {
-	// let port = bootServer();
-	// await open(`http://localhost:${port}`);
-	vscode.window.showErrorMessage('This feature has been temporarily disabled do to a bug.');
+async function showOnWeb() {
+	let port = bootServer();
+	await open(`http://localhost:${port}`);
 }
 
 function updateBarItem() {
