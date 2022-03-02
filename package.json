@@ -32,8 +32,7 @@
     }
   },
   "contributes": {
-    "commands": [
-      {
+    "commands": [{
         "command": "mimjas-time-tracker.showCat",
         "title": "Show the Fabled Cat GIF",
         "category": "Time Tracker"
@@ -44,45 +43,42 @@
         "category": "Time Tracker"
       }
     ],
-    "configuration": [
-      {
-        "title": "Mimjas Time Tracker",
-        "properties": {
-          "mimjas-time-tracker.iconStyle": {
-            "type": "string",
-            "default": "circuit-board",
-            "description": "Type in the default codicon ID for the icon you want.\nList of icons -> https://code.visualstudio.com/api/references/icons-in-labels#icon-listing"
-          },
-          "mimjas-time-tracker.labelPosition": {
-            "type": "string",
-            "enum": [
-              "Left",
-              "Right"
-            ],
-            "default": "Left",
-            "description": "Defines the position on the time label."
-          },
-          "mimjas-time-tracker.labelPriority": {
-            "type": "boolean",
-            "description": "Will be more towards the center of the statues bar when on."
-          },
-          "mimjas-time-tracker.timeTillIdle": {
-            "type": "number",
-            "default": "5",
-            "minimum": 1,
-            "maximum": 60,
-            "description": "The amount of time in minutes before the time tracker will idle."
-          }
+    "configuration": [{
+      "title": "Mimjas Time Tracker",
+      "properties": {
+        "mimjas-time-tracker.iconStyle": {
+          "type": "string",
+          "default": "circuit-board",
+          "description": "Type in the default codicon ID for the icon you want.\nList of icons -> https://code.visualstudio.com/api/references/icons-in-labels#icon-listing"
+        },
+        "mimjas-time-tracker.labelPosition": {
+          "type": "string",
+          "enum": [
+            "Left",
+            "Right"
+          ],
+          "default": "Left",
+          "description": "Defines the position on the time label."
+        },
+        "mimjas-time-tracker.labelPriority": {
+          "type": "boolean",
+          "description": "Will be more towards the center of the statues bar when on."
+        },
+        "mimjas-time-tracker.timeTillIdle": {
+          "type": "number",
+          "default": "5",
+          "minimum": 1,
+          "maximum": 60,
+          "description": "The amount of time in minutes before the time tracker will idle."
         }
       }
-    ]
+    }]
   },
   "devDependencies": {
     "esbuild": "^0.14.23",
     "eslint": "^8.6.0"
   },
   "dependencies": {
-    "brainunfuck": "^1.1.4",
     "express": "^4.17.2",
     "open": "^8.4.0"
   }

@@ -13,6 +13,7 @@ global.timeTillIdle = 5 * 60 * 1000;
 global.fileDir = "time-tracker-storage-mimja";
 global.fileName = "time.mim";
 global.idleTimeout = null;
+global.item = null;
 
 module.exports.extensionGlobals = global;
 
@@ -46,11 +47,8 @@ function activate(context) {
 		unIdle(null);
 
 		if (global.labelPosition !== cache.labelPosition || global.labelPriority !== cache.labelPriority) {
-			vscode.window.showInformationMessage('Reload VSCode to see the changes.', 'Reload').then(selection => {
-				if (selection == 'Reload') {
-					vscode.commands.executeCommand("workbench.action.reloadWindow");
-				}
-			});
+			initiateCountingBadge(context);
+			updateBarItem();
 		}
 
 		if (global.iconString !== cache.iconString) {
@@ -63,10 +61,7 @@ function activate(context) {
 	})
 
 	// create the bar icon
-	global.item = vscode.window.createStatusBarItem(global.labelPosition, global.labelPriority);
-	global.item.command = 'mimjas-time-tracker.timeStatuesItemClicked';
-	context.subscriptions.push(global.item);
-	global.item.show();
+	initiateCountingBadge(context);
 
 	//Listen for click on the time logger item in the status bar
 	context.subscriptions.push(vscode.commands.registerCommand('mimjas-time-tracker.timeStatuesItemClicked', showOnWeb));
@@ -233,7 +228,9 @@ function defineCurrentSettings() {
 		}
 	}
 
-	global.timeTillIdle = vscode.workspace.getConfiguration().get('mimjas-time-tracker.timeTillIdle') * 1000 * 60;
+	if (vscode.workspace.getConfiguration().get('mimjas-time-tracker.timeTillIdle') >= 1 || vscode.workspace.getConfiguration().get('mimjas-time-tracker.timeTillIdle') <= 60) {
+		global.timeTillIdle = vscode.workspace.getConfiguration().get('mimjas-time-tracker.timeTillIdle') * 60 * 1000;
+	}
 }
 
 /**
@@ -274,6 +271,19 @@ function showCat() {
 		<img src="https://media.giphy.com/media/JIX9t2j0ZTN9S/giphy.gif" width="650" />
 	</body>
 	</html>`;
+}
+
+/**
+ * This will remove the current counting badge and re-make it.
+ * Basically updating the item.
+ * @param {context} context 
+ */
+function initiateCountingBadge(context) {
+	if (global.item != null) global.item.dispose();
+	global.item = vscode.window.createStatusBarItem(global.labelPosition, global.labelPriority);
+	global.item.command = 'mimjas-time-tracker.timeStatuesItemClicked';
+	context.subscriptions.push(global.item);
+	global.item.show();
 }
 
 function deactivate() {
