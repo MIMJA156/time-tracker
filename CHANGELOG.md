@@ -75,3 +75,7 @@ All Changes made are logged in this file.
 
 ## 1.0.6
 - Added more settings and commands
+
+## 1.0.7
+- Added more settings and made the interface better
+- Most likely added some bugs too

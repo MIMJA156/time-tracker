@@ -1,7 +1,7 @@
 const vscode = require('vscode');
 const fs = require('fs');
-const open = require('open');
-const bootServer = require('./server');
+// const open = require('open');
+// const bootServer = require('./server');
 
 const global = {};
 const cache = {};
@@ -90,8 +90,9 @@ function activate(context) {
 }
 
 async function showOnWeb() {
-	let port = bootServer();
-	await open(`http://localhost:${port}`);
+	vscode.window.showErrorMessage('This feature has been temporarily disabled due to a bug.');
+	// let port = bootServer();
+	// await open(`http://localhost:${port}`);
 }
 
 function updateBarItem() {
@@ -237,13 +238,21 @@ function defineCurrentSettings() {
  * This function that handles the idle timer.
  */
 function unIdle(event) {
-	if (global.isIdle) global.isIdle = false;
+	if (global.isIdle) {
+		global.isIdle = false;
+		updateBarItem();
+	}
 	if (event != null && !event.focused) return;
 
 	clearTimeout(global.idleTimeout);
 	global.idleTimeout = setTimeout(() => {
 		global.isIdle = true;
-		vscode.window.showInformationMessage('Idle mode has been activated. Time will not be logged until you resume coding.');
+
+		vscode.window.showInformationMessage('Idle mode has been activated.\nIf this idle timer is to short, you can change it in the settings.', 'Change Settings').then(() => {
+			vscode.commands.executeCommand('workbench.action.openSettings', 'mimjas-time-tracker');
+		});
+
+		global.item.text = `${global.iconString} Idle`;
 	}, global.timeTillIdle);
 }
 
