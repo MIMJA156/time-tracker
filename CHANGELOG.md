@@ -79,3 +79,6 @@ All Changes made are logged in this file.
 ## 1.0.7
 - Added more settings and made the interface better
 - Most likely added some bugs too
+
+## 1.0.8
+- Changed spelling - per Eliot's request

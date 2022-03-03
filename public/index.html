@@ -4,79 +4,18 @@
 <head>
     <script src="./JS/jquery-3.6.0.js"></script>
     <script src="./JS/chart.js"></script>
+    <link rel="stylesheet" href="style.css">
 </head>
-<style>
-    .top-bar {
-        width: 100%;
-        text-align: center;
-        font-size: 30px;
-    }
-
-    .left {
-        float: left;
-    }
-
-    .right {
-        float: right;
-    }
-
-    .button {
-        background-color: cyan;
-        border: none;
-        height: 33px;
-        display: flex;
-        align-items: center;
-        font-size: 15px;
-    }
-
-    .button:hover {
-        filter: brightness(0.9);
-        cursor: pointer;
-    }
-
-    #current-date {
-        font-size: 25px;
-    }
-
-    .graph-container {
-        padding-left: 20px;
-        padding-right: 20px;
-    }
-</style>
 
 <body>
-    <!-- <div class="top-bar">
-        <button class="left button" id="back"><img src="./SVGS/chevron-left.svg"><span id="back-text"></span></button>
+    <div class="top-bar">
+        <button class="l button"><img id="l-img" src="./SVGS/chevron-left.svg"><span id="b-text"></span></button>
         <span id="current-date"></span>
-        <button class="right button" id="forward"><span id="forward-text"></span><img
-                src="./SVGS/chevron-right.svg"></button>
+        <button class="r button"><span id="f-text"></span><img id="r-img" src="./SVGS/chevron-right.svg"></button>
     </div>
-
-    <div class="graph-container">
-        <canvas id="chart"></canvas>
-    </div> -->
-
-    <div>
-        This is still in progress so please check back later.
-    </div>
+    <input type="checkbox" id="check" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 50px;
+        height: 50px; cursor: pointer;">
 </body>
-
-<script>
-    var given = {
-        current: "2022-1-23/2022-1-29",
-        "2022-1-2/2022-1-8": {
-            active: [2000, 2000, 2000, 2000, 2000, 2000, 2000]
-        },
-        "2022-1-9/2022-1-15": {
-            active: [1500, 1500, 1500, 1500, 1500, 1500, 1500]
-        },
-        "2022-1-16/2022-1-22": {
-            active: [1000, 1000, 1000, 1000, 1000, 1000, 1000]
-        },
-        "2022-1-23/2022-1-29": {
-            active: [500, 500, 500, 500, 500, 500, 500]
-        }
-    };
-</script>
+<script src="./script.js"></script>
 
 </html>
