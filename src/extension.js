@@ -15,7 +15,8 @@ global.fileName = "time.mim";
 global.idleTimeout = null;
 global.item = null;
 
-module.exports.extensionGlobals = global;
+module.exports.fileDir = global.fileDir;
+module.exports.fileName = global.fileName;
 
 /**
  * This functions returns an array containing information about the current local time.

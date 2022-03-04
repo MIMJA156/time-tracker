@@ -1,6 +1,11 @@
 const path = require("path");
 const port = 3217
 const express = require("express");
+const fs = require("fs");
+const {
+    fileDir,
+    fileName
+} = require("./extension.js");
 
 module.exports = () => {
     bootServer();
@@ -17,11 +22,11 @@ function bootServer() {
     });
 
     app.get('/api/initial-data', (req, res) => {
-
+        res.send("HALLO");
     });
 
     app.get('/api/update-data', (req, res) => {
-
+        res.send("HALLO");
     });
 
     app.listen(port, () => {
