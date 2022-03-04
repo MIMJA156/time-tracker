@@ -9,12 +9,15 @@
 
 <body>
     <div class="top-bar">
-        <button class="l button"><img id="l-img" src="./SVGS/chevron-left.svg"><span id="b-text"></span></button>
+        <button class="l button"><img id="l-img" src="./SVGS/chevron-left.svg"><span>Back One Week</span></button>
         <span id="current-date"></span>
-        <button class="r button"><span id="f-text"></span><img id="r-img" src="./SVGS/chevron-right.svg"></button>
+        <button class="r button"><span>Forward One Week</span><img id="r-img" src="./SVGS/chevron-right.svg"></button>
     </div>
-    <input type="checkbox" id="check" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 50px;
-        height: 50px; cursor: pointer;">
+    <div class="bottom-bar">
+        <div id="connection-statues-container">
+            <img id="statues-img" src="./SVGS/connecting-1.svg">
+            <span id="statues-text">Connecting...</span>
+        </div>
 </body>
 <script src="./script.js"></script>
 

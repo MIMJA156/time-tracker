@@ -94,9 +94,9 @@ function activate(context) {
 
 async function showOnWeb() {
 	if (!global.isIdle) {
-		// let port = bootServer();
-		// await open(`http://localhost:${port}`);
-		vscode.window.showErrorMessage('This feature has been temporarily disabled due to a bug.');
+		let port = bootServer();
+		await open(`http://localhost:${port}`);
+		// vscode.window.showErrorMessage('This feature has been temporarily disabled due to a bug.');
 	} else {
 		vscode.window.showInformationMessage('Idle mode is currently active. If this idle timer is too short, you can change it in the settings.', 'Change Settings').then((s) => {
 			if (s == 'Change Settings') {

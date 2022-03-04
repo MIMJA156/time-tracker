@@ -12,7 +12,7 @@ function bootServer() {
 
     app.use(express.static(path.join(__dirname, "../public/")));
 
-    app.get('/api/', (req, res) => {
+    app.get('/api', (req, res) => {
         res.send('The server is up and running!');
     });
 
