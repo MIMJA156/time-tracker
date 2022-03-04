@@ -85,3 +85,6 @@ All Changes made are logged in this file.
 
 ## 1.0.9
 - Fixed Bug(I think) - Extensions setting page would automatically open on idle
+
+## 1.0.10
+- Added more unIdle events

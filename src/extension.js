@@ -77,9 +77,11 @@ function activate(context) {
 	vscode.workspace.onDidCreateFiles(createEvent => unIdle(createEvent));
 	vscode.workspace.onDidDeleteFiles(deleteEvent => unIdle(deleteEvent));
 	vscode.workspace.onDidRenameFiles(renameEvent => unIdle(renameEvent));
+	vscode.workspace.onDidOpenTextDocument(openEvent => unIdle(openEvent));
+	vscode.workspace.onDidCloseTextDocument(closeEvent => unIdle(closeEvent));
 	vscode.window.onDidOpenTerminal(terminal => unIdle(terminal));
 	vscode.window.onDidCloseTerminal(terminal => unIdle(terminal));
-	// vscode.window.onDidChangeWindowState(state => unIdle(state));
+	vscode.window.onDidChangeWindowState(state => unIdle(state));
 
 	//Create any random commands.
 	const showCatCommand = 'mimjas-time-tracker.showCat';
