@@ -44,7 +44,7 @@ function activate(context) {
 
 	vscode.workspace.onDidChangeConfiguration(() => {
 		defineCurrentSettings();
-		unIdle(null);
+		unIdle();
 
 		if (global.labelPosition !== cache.labelPosition || global.labelPriority !== cache.labelPriority) {
 			initiateCountingBadge(context);
@@ -70,7 +70,7 @@ function activate(context) {
 	initializeTimeValues();
 	updateBarItem();
 	initiateCounting();
-	unIdle(69);
+	unIdle();
 
 	// Listen for un-idle events
 	vscode.workspace.onDidChangeTextDocument(changeEvent => unIdle(changeEvent));
@@ -79,7 +79,7 @@ function activate(context) {
 	vscode.workspace.onDidRenameFiles(renameEvent => unIdle(renameEvent));
 	vscode.window.onDidOpenTerminal(terminal => unIdle(terminal));
 	vscode.window.onDidCloseTerminal(terminal => unIdle(terminal));
-	vscode.window.onDidChangeWindowState(state => unIdle(state));
+	// vscode.window.onDidChangeWindowState(state => unIdle(state));
 
 	//Create any random commands.
 	const showCatCommand = 'mimjas-time-tracker.showCat';
@@ -90,8 +90,17 @@ function activate(context) {
 }
 
 async function showOnWeb() {
-	let port = bootServer();
-	await open(`http://localhost:${port}`);
+	if (!global.isIdle) {
+		// let port = bootServer();
+		// await open(`http://localhost:${port}`);
+		vscode.window.showErrorMessage('This feature has been temporarily disabled due to a bug.');
+	} else {
+		vscode.window.showInformationMessage('Idle mode is currently active. If this idle timer is too short, you can change it in the settings.', 'Change Settings').then((s) => {
+			if (s == 'Change Settings') {
+				vscode.commands.executeCommand('workbench.action.openSettings', 'mimjas-time-tracker');
+			}
+		});
+	}
 }
 
 function updateBarItem() {
@@ -236,12 +245,11 @@ function defineCurrentSettings() {
 /**
  * This function that handles the idle timer.
  */
-function unIdle(event) {
+function unIdle() {
 	if (global.isIdle) {
 		global.isIdle = false;
 		updateBarItem();
 	}
-	if (event != null && !event.focused) return;
 
 	clearTimeout(global.idleTimeout);
 	global.idleTimeout = setTimeout(() => {
