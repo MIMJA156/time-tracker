@@ -73,12 +73,13 @@ function activate(context) {
 	unIdle();
 
 	// Listen for un-idle events
+	vscode.workspace.onDidOpenTextDocument(openEvent => unIdle(openEvent));
+	vscode.workspace.onDidCloseTextDocument(closeEvent => unIdle(closeEvent));
 	vscode.workspace.onDidChangeTextDocument(changeEvent => unIdle(changeEvent));
 	vscode.workspace.onDidCreateFiles(createEvent => unIdle(createEvent));
 	vscode.workspace.onDidDeleteFiles(deleteEvent => unIdle(deleteEvent));
 	vscode.workspace.onDidRenameFiles(renameEvent => unIdle(renameEvent));
-	vscode.workspace.onDidOpenTextDocument(openEvent => unIdle(openEvent));
-	vscode.workspace.onDidCloseTextDocument(closeEvent => unIdle(closeEvent));
+
 	vscode.window.onDidOpenTerminal(terminal => unIdle(terminal));
 	vscode.window.onDidCloseTerminal(terminal => unIdle(terminal));
 	vscode.window.onDidChangeWindowState(state => unIdle(state));
@@ -247,7 +248,9 @@ function defineCurrentSettings() {
 /**
  * This function that handles the idle timer.
  */
-function unIdle() {
+function unIdle(e) {
+	console.log(e);
+
 	if (global.isIdle) {
 		global.isIdle = false;
 		updateBarItem();
