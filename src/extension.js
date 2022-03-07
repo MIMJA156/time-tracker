@@ -250,8 +250,6 @@ function defineCurrentSettings() {
  * This function that handles the idle timer.
  */
 function unIdle(e) {
-	console.log(e);
-
 	if (global.isIdle) {
 		global.isIdle = false;
 		updateBarItem();

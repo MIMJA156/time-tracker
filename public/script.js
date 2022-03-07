@@ -10,14 +10,12 @@ var given = {
         active: [1000, 1000, 1000, 1000, 1000, 1000, 1000]
     },
     "2022-1-23/2022-1-29": {
-        active: [500, 500, 500, 5000, 500, 500, 500]
+        active: [500, 500, 500, 3000, 500, 500, 500]
     }
 };
 
 var chartMade = false;
 var chart = null;
-
-$('#current-date').text(given.current);
 
 let count = 1;
 let connectingInterval = setInterval(() => {
@@ -62,7 +60,7 @@ function updateChart(data) {
 
     } else {
         chart = new Chart($('#chart'), {
-            type: 'bar',
+            type: 'line',
             data: {
                 labels: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday',
                     'Saturday'
@@ -95,12 +93,19 @@ function updateChart(data) {
                             }
                         }
                     }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
                 }
             }
         });
 
         chartMade = true;
+        $('#loading-img').css('display', 'none');
         $('#statues-text').text('Ready');
+        $('#current-date').text(given.current);
     }
 }
 
