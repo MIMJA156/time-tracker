@@ -23,7 +23,7 @@ module.exports.fileName = global.fileName;
  * @returns {[year, month, day, hour, minute, sec, today]}
  */
 global.currentTime = () => {
-	const today = new Date();
+	const today = new Date(`2022-04-1`);
 	const yyyy = today.getFullYear();
 	const mm = today.getMonth() + 1;
 	const dd = today.getDate();

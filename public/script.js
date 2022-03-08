@@ -27,7 +27,7 @@ let connectingInterval = setInterval(() => {
 $.ajax({
     url: `http://localhost:${document.location.port}/api`,
     method: 'GET',
-    success: (data) => {
+    success: (timeData) => {
         setTimeout(() => {
             clearInterval(connectingInterval);
             $('#statues-img').attr('src', `./SVGS/succeeded.svg`);
@@ -36,8 +36,11 @@ $.ajax({
                 $.ajax({
                     url: `http://localhost:${document.location.port}/api/initial-data`,
                     method: 'GET',
-                    success: (data) => {
+                    success: (timeData) => {
                         updateChart(timeData);
+                    },
+                    error: (err) => {
+                        postError('Server Error.');
                     }
                 })
             }, getRandomTimeout());
@@ -46,8 +49,7 @@ $.ajax({
     error: (err) => {
         setTimeout(() => {
             clearInterval(connectingInterval);
-            $('#statues-img').attr('src', `./SVGS/failed.svg`);
-            $('#statues-text').text('Failed to connect.');
+            postError('Failed to connect.');
         }, getRandomTimeout());
     }
 });
@@ -59,54 +61,68 @@ function updateChart(timeData) {
     if (chartMade) {
         console.log("Updating chart...");
     } else {
-        chart = new Chart($('#chart'), {
-            type: 'line',
-            data: {
-                labels: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday',
-                    'Saturday'
-                ],
-                datasets: [{
-                    label: 'Time Spent Coding This Week',
-                    backgroundColor: ['#000000'],
-                    data: timeData[timeData.current].active,
-                }]
-            },
-            options: {
-                plugins: {
-                    tooltip: {
-                        callbacks: {
-                            label: function (context) {
-                                let hours = `${(timeData[timeData.current].active[context.dataIndex] / 60) /
+        try {
+            chart = new Chart($('#chart'), {
+                type: 'line',
+                data: {
+                    labels: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday',
+                        'Saturday'
+                    ],
+                    datasets: [{
+                        label: 'Time Spent Coding This Week',
+                        backgroundColor: ['#000000'],
+                        data: timeData[timeData.current].active,
+                    }]
+                },
+                options: {
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: function (context) {
+                                    let hours = `${(timeData[timeData.current].active[context.dataIndex] / 60) /
                                 60}`.split('.')[0];
-                                let minutes = `${((timeData[timeData.current].active[context.dataIndex] / 60) - (hours *
+                                    let minutes = `${((timeData[timeData.current].active[context.dataIndex] / 60) - (hours *
                                 60))}`.split('.')[0];
 
-                                let h_s = `${hours} hr`;
-                                let m_s = `${minutes} min`;
+                                    let h_s = `${hours} hr`;
+                                    let m_s = `${minutes} min`;
 
-                                if (hours <= 0) h_s = '';
-                                if (minutes <= 0) m_s = '';
-                                if (hours > 1) h_s = `${h_s}s`;
-                                if (minutes > 1) m_s = `${m_s}s`;
+                                    if (hours <= 0) h_s = '';
+                                    if (minutes <= 0) m_s = '';
+                                    if (hours > 1) h_s = `${h_s}s`;
+                                    if (minutes > 1) m_s = `${m_s}s`;
 
-                                return `${h_s} ${m_s}`;
+                                    return `${h_s} ${m_s}`;
+                                }
                             }
                         }
-                    }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
                     }
                 }
-            }
-        });
+            });
 
-        chartMade = true;
-        $('#loading-img').css('display', 'none');
-        $('#statues-text').text('Ready');
-        $('#current-date').text(timeData.current);
+            chartMade = true;
+            $('#loading-img').css('display', 'none');
+            $('#statues-text').text('Ready');
+            $('#current-date').text(timeData.current);
+        } catch (err) {
+            postError('Unknown Error Occurred.');
+        }
     }
+}
+
+/**
+ * Call an error to be displayed.
+ */
+function postError(errMsg) {
+    $('#statues-img').attr('src', `./SVGS/failed.svg`);
+    $('#loading-img-dis').attr('src', `./SVGS/failed.svg`);
+    $('#statues-text').text(errMsg);
+    $('#current-date').text('Undefined');
 }
 
 /**
