@@ -1,4 +1,4 @@
-var given = {
+var timeData = {
     current: "2022-1-23/2022-1-29",
     "2022-1-2/2022-1-8": {
         active: [2000, 2000, 2000, 2000, 2000, 2000, 2000]
@@ -37,7 +37,7 @@ $.ajax({
                     url: `http://localhost:${document.location.port}/api/initial-data`,
                     method: 'GET',
                     success: (data) => {
-                        updateChart(given);
+                        updateChart(timeData);
                     }
                 })
             }, getRandomTimeout());
@@ -55,9 +55,9 @@ $.ajax({
 /**
  * This function initiates/updates the chart.
  */
-function updateChart(data) {
+function updateChart(timeData) {
     if (chartMade) {
-
+        console.log("Updating chart...");
     } else {
         chart = new Chart($('#chart'), {
             type: 'line',
@@ -68,7 +68,7 @@ function updateChart(data) {
                 datasets: [{
                     label: 'Time Spent Coding This Week',
                     backgroundColor: ['#000000'],
-                    data: given[given.current].active,
+                    data: timeData[timeData.current].active,
                 }]
             },
             options: {
@@ -76,9 +76,9 @@ function updateChart(data) {
                     tooltip: {
                         callbacks: {
                             label: function (context) {
-                                let hours = `${(given[given.current].active[context.dataIndex] / 60) /
+                                let hours = `${(timeData[timeData.current].active[context.dataIndex] / 60) /
                                 60}`.split('.')[0];
-                                let minutes = `${((given[given.current].active[context.dataIndex] / 60) - (hours *
+                                let minutes = `${((timeData[timeData.current].active[context.dataIndex] / 60) - (hours *
                                 60))}`.split('.')[0];
 
                                 let h_s = `${hours} hr`;
@@ -105,7 +105,7 @@ function updateChart(data) {
         chartMade = true;
         $('#loading-img').css('display', 'none');
         $('#statues-text').text('Ready');
-        $('#current-date').text(given.current);
+        $('#current-date').text(timeData.current);
     }
 }
 

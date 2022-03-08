@@ -78,6 +78,8 @@ body {
     transform: translate(-50%, -50%);
     font-size: 30px;
     display: flex;
+    width: 150px;
+    height: 150px;
 }
 
 .l {
