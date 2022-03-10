@@ -47,15 +47,41 @@ function bootServer() {
             tillValues[0] = getDaysInMonth(currentRecordedMonth - 1, currentRecordedYear) + tillValues[0];
         }
 
-        let currentWeek = [];
-
         let tillCurrentWeekEnd = await loopTillValue(currentDayIndex, 6, '>');
         let tillCurrentWeekStart = await loopTillValue(currentDayIndex, 0, '<');
 
         let firstCurrentDay = currentRecordedDay + tillCurrentWeekEnd;
-        let secondCurrentDay = getDaysInMonth(currentRecordedMonth - 1, currentRecordedYear) + (currentRecordedDay - tillCurrentWeekStart);
+        let secondCurrentDay = currentRecordedDay - tillCurrentWeekStart;
 
-        let lastWeek = [];
+        let firstCurrentMonth = currentRecordedMonth;
+        let secondCurrentMonth = currentRecordedMonth;
+
+        let firstCurrentYear = currentRecordedYear;
+        let secondCurrentYear = currentRecordedYear;
+
+        if (firstCurrentDay > getDaysInMonth(firstCurrentMonth, firstCurrentYear)) {
+            firstCurrentMonth = currentRecordedMonth + 1;
+            if (firstCurrentMonth > 12) {
+                firstCurrentMonth = 1;
+                firstCurrentYear += 1;
+            }
+            firstCurrentDay = firstCurrentDay - getDaysInMonth(firstCurrentMonth - 1, firstCurrentYear);
+        }
+
+        if (secondCurrentDay < 1) {
+            secondCurrentMonth -= 1;
+            if (secondCurrentMonth < 1) {
+                secondCurrentMonth = 12;
+                secondCurrentYear -= 1;
+            }
+            secondCurrentDay = getDaysInMonth(secondCurrentMonth, secondCurrentYear) + secondCurrentDay;
+        }
+
+        graphDataChanged.current = `${firstCurrentYear}-${firstCurrentMonth}-${firstCurrentDay}/${secondCurrentYear}-${secondCurrentMonth}-${secondCurrentDay}`;
+
+        console.log(firstCurrentDay);
+        console.log(secondCurrentDay);
+        console.log(`${firstCurrentYear}-${firstCurrentMonth}-${firstCurrentDay}/${secondCurrentYear}-${secondCurrentMonth}-${secondCurrentDay}`);
 
         res.send(graphDataChanged);
     });
