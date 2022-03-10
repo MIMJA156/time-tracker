@@ -10,15 +10,19 @@
 <body>
     <div class="top-bar">
         <button class="l button"><img id="l-img" src="./SVGS/chevron-left.svg"><span>Back One Week</span></button>
-        <span id="current-date"></span>
+        <span id="current-date"><img src="./SVGS/three-dots.svg"></span>
         <button class="r button"><span>Forward One Week</span><img id="r-img" src="./SVGS/chevron-right.svg"></button>
     </div>
     <canvas id="chart"></canvas>
+    <dic id="loading-img">
+        <img id="loading-img-dis" src="./SVGS/loading.svg">
+    </dic>
     <div class="bottom-bar">
         <div id="connection-statues-container">
             <img id="statues-img" src="./SVGS/connecting-1.svg">
             <span id="statues-text">Connecting...</span>
         </div>
+    </div>
 </body>
 <script src="./script.js"></script>
 

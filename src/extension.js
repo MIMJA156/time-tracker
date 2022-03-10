@@ -21,7 +21,7 @@ global.item = null;
  * @returns {[year, month, day, hour, minute, sec, today]}
  */
 global.currentTime = () => {
-	const today = new Date();
+	const today = new Date(`2022-04-1`);
 	const yyyy = today.getFullYear();
 	const mm = today.getMonth() + 1;
 	const dd = today.getDate();
@@ -248,8 +248,6 @@ function defineCurrentSettings() {
  * This function that handles the idle timer.
  */
 function unIdle(e) {
-	console.log(e);
-
 	if (global.isIdle) {
 		global.isIdle = false;
 		updateBarItem();
