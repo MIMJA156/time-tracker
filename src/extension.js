@@ -2,6 +2,9 @@ const vscode = require('vscode');
 const fs = require('fs');
 const open = require('open');
 const bootServer = require('./server');
+const {
+	file
+} = require('../config.json');
 
 const global = {};
 const cache = {};
@@ -10,13 +13,8 @@ global.json = {};
 global.isIdle = false;
 global.minutesInADay = 1440;
 global.timeTillIdle = 5 * 60 * 1000;
-global.fileDir = "time-tracker-storage-mimja";
-global.fileName = "time.mim";
 global.idleTimeout = null;
 global.item = null;
-
-module.exports.fileDir = global.fileDir;
-module.exports.fileName = global.fileName;
 
 /**
  * This functions returns an array containing information about the current local time.
@@ -132,13 +130,13 @@ function initializeTimeValues() {
 	let savedTimeJson;
 
 	try {
-		savedTimeJson = fs.readFileSync(`${__dirname}/../../${global.fileDir}/${global.fileName}.json`, 'utf8');
+		savedTimeJson = fs.readFileSync(`${__dirname}/../../${file.dir}/${file.name}.json`, 'utf8');
 	} catch (e) {
 		try {
-			fs.mkdirSync(`${__dirname}/../../${global.fileDir}/`);
+			fs.mkdirSync(`${__dirname}/../../${file.dir}/`);
 		} catch (e) {};
-		fs.writeFileSync(`${__dirname}/../../${global.fileDir}/${global.fileName}.json`, '{}');
-		savedTimeJson = fs.readFileSync(`${__dirname}/../../${global.fileDir}/${global.fileName}.json`, 'utf8');
+		fs.writeFileSync(`${__dirname}/../../${file.dir}/${file.name}.json`, '{}');
+		savedTimeJson = fs.readFileSync(`${__dirname}/../../${file.dir}/${file.name}.json`, 'utf8');
 	}
 
 	global.json = checkJson(savedTimeJson);
@@ -155,7 +153,7 @@ function initiateCounting() {
 		global.json[global.currentTime()[0]][global.currentTime()[1]][global.currentTime()[2]].active++;
 		if (global.json[global.currentTime()[0]][global.currentTime()[1]][global.currentTime()[2]].active % 60 == 0) {
 			updateBarItem();
-			fs.writeFileSync(`${__dirname}/../../${global.fileDir}/${global.fileName}.json`, JSON.stringify(global.json));
+			fs.writeFileSync(`${__dirname}/../../${file.dir}/${file.name}.json`, JSON.stringify(global.json));
 		}
 	}, 1000)
 }
@@ -203,7 +201,7 @@ function checkJson(json) {
 	}
 
 	if (hasChanged) {
-		fs.writeFileSync(`${__dirname}/../../${global.fileDir}/${global.fileName}.json`, JSON.stringify(checkedJson), null, 4);
+		fs.writeFileSync(`${__dirname}/../../${file.dir}/${file.name}.json`, JSON.stringify(checkedJson), null, 4);
 	}
 
 	return checkedJson;
@@ -311,7 +309,7 @@ function initiateCountingBadge(context) {
 }
 
 function deactivate() {
-	fs.writeFileSync(`${__dirname}/../../${global.fileDir}/${global.fileName}.json`, JSON.stringify(global.json));
+	fs.writeFileSync(`${__dirname}/../../${file.dir}/${file.name}.json`, JSON.stringify(global.json));
 }
 
 module.exports = {

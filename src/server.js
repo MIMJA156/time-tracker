@@ -1,11 +1,10 @@
 const path = require("path");
 const port = 3217
-const express = require("express");
+const ex = require("express");
 const fs = require("fs");
 const {
-    fileDir,
-    fileName
-} = require("./extension.js");
+    file
+} = require('../config.json');
 
 module.exports = () => {
     bootServer();
@@ -13,20 +12,25 @@ module.exports = () => {
 };
 
 function bootServer() {
-    let app = express();
+    let app = ex();
 
-    app.use(express.static(path.join(__dirname, "../public/")));
+    app.use(ex.static(path.join(__dirname, "../public/")));
 
     app.get('/api', (req, res) => {
         res.send('The server is up and running!');
     });
 
     app.get('/api/initial-data', (req, res) => {
-        res.send("HALLO");
+        const json = JSON.parse(fs.readFileSync(`${__dirname}/../../${file.dir}/${file.name}.json`, 'utf8'));
+        const changed = {};
+
+
+
+        res.send(changed);
     });
 
     app.get('/api/update-data', (req, res) => {
-        res.send("HALLO");
+        res.send("HALLOO");
     });
 
     app.listen(port, () => {
