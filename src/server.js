@@ -35,54 +35,54 @@ function bootServer() {
         let currentRecordedMonth = parseFloat(Object.keys(parsed[currentRecordedYear])[Object.keys(parsed[currentRecordedYear]).length - 1]);
         let currentRecordedDay = parseFloat(Object.keys(parsed[currentRecordedYear][currentRecordedMonth])[Object.keys(parsed[currentRecordedYear][currentRecordedMonth]).length - 1]);
 
-        let currentDayIndex = new Date(`${currentRecordedYear}-${currentRecordedMonth}-${currentRecordedDay}`).getDay();
-
         console.log(`First year: ${firstRecordedYear}/${firstRecordedMonth}/${firstRecordedDay}`);
         console.log(`Current Date: ${currentRecordedYear}/${currentRecordedMonth}/${currentRecordedDay}`);
 
-        let tillValues = [currentRecordedDay - await loopTillValue(currentDayIndex, 0, '<'), currentRecordedDay + await loopTillValue(currentDayIndex, 6, '>')];
+        let currentWeek = await dateToWeek(currentRecordedDay, currentRecordedMonth, currentRecordedYear);
+        let firstWeek = await dateToWeek(firstRecordedDay, firstRecordedMonth, firstRecordedYear);
 
-        if (tillValues[0] < 1) {
-            if (currentRecordedMonth - 1 < 1) currentRecordedMonth = 12;
-            tillValues[0] = getDaysInMonth(currentRecordedMonth - 1, currentRecordedYear) + tillValues[0];
-        }
+        graphDataChanged.current = `${currentWeek[0]}-${currentWeek[1]}-${currentWeek[2]}/${currentWeek[3]}-${currentWeek[4]}-${currentWeek[5]}`;
 
-        let tillCurrentWeekEnd = await loopTillValue(currentDayIndex, 6, '>');
-        let tillCurrentWeekStart = await loopTillValue(currentDayIndex, 0, '<');
+        let firstDate = new Date(`${firstWeek[3]}/${firstWeek[4]}/${firstWeek[5]}`);
+        let currentDate = new Date(`${currentWeek[0]}/${currentWeek[1]}/${currentWeek[2]}`);
+        let DifferenceInTime = currentDate.getTime() - firstDate.getTime();
+        let DifferenceInDays = Math.ceil(DifferenceInTime / (1000 * 3600 * 24) + 1);
 
-        let firstCurrentDay = currentRecordedDay + tillCurrentWeekEnd;
-        let secondCurrentDay = currentRecordedDay - tillCurrentWeekStart;
-
-        let firstCurrentMonth = currentRecordedMonth;
-        let secondCurrentMonth = currentRecordedMonth;
-
-        let firstCurrentYear = currentRecordedYear;
-        let secondCurrentYear = currentRecordedYear;
-
-        if (firstCurrentDay > getDaysInMonth(firstCurrentMonth, firstCurrentYear)) {
-            firstCurrentMonth = currentRecordedMonth + 1;
-            if (firstCurrentMonth > 12) {
-                firstCurrentMonth = 1;
-                firstCurrentYear += 1;
+        let array = [];
+        let temp = [...currentWeek];
+        for (let i = 1; i < DifferenceInDays; i++) {
+            try {
+                array.push(parsed[temp[0]][temp[1]][temp[2]].active);
+            } catch (e) {
+                array.push(0);
             }
-            firstCurrentDay = firstCurrentDay - getDaysInMonth(firstCurrentMonth - 1, firstCurrentYear);
-        }
 
-        if (secondCurrentDay < 1) {
-            secondCurrentMonth -= 1;
-            if (secondCurrentMonth < 1) {
-                secondCurrentMonth = 12;
-                secondCurrentYear -= 1;
+            temp[2] -= 1;
+            if (temp[2] < 1) {
+                temp[1] -= 1;
+                temp[2] = getDaysInMonth(temp[1], temp[0]);
             }
-            secondCurrentDay = getDaysInMonth(secondCurrentMonth, secondCurrentYear) + secondCurrentDay;
+
+            if (i / 7 === Math.floor(i / 7)) {
+                graphDataChanged[`${currentWeek[0]}-${currentWeek[1]}-${currentWeek[2]}/${currentWeek[3]}-${currentWeek[4]}-${currentWeek[5]}`] = {};
+                graphDataChanged[`${currentWeek[0]}-${currentWeek[1]}-${currentWeek[2]}/${currentWeek[3]}-${currentWeek[4]}-${currentWeek[5]}`].active = array;
+                array = [];
+
+                currentWeek[2] -= 7;
+                if (currentWeek[2] < 1) {
+                    currentWeek[1]--;
+                    currentWeek[2] = getDaysInMonth(currentWeek[1], currentWeek[0]) + currentWeek[2];
+                }
+
+                currentWeek[5] -= 7;
+                if (currentWeek[5] < 1) {
+                    currentWeek[4]--;
+                    currentWeek[5] = getDaysInMonth(currentWeek[4], currentWeek[3]) + currentWeek[5];
+                }
+            }
         }
 
-        graphDataChanged.current = `${firstCurrentYear}-${firstCurrentMonth}-${firstCurrentDay}/${secondCurrentYear}-${secondCurrentMonth}-${secondCurrentDay}`;
-
-        console.log(firstCurrentDay);
-        console.log(secondCurrentDay);
-        console.log(`${firstCurrentYear}-${firstCurrentMonth}-${firstCurrentDay}/${secondCurrentYear}-${secondCurrentMonth}-${secondCurrentDay}`);
-
+        console.log(graphDataChanged);
         res.send(graphDataChanged);
     });
 
@@ -142,4 +142,40 @@ async function loopTillValue(val, till, sign) {
     })
 
     return await isDone;
+}
+
+async function dateToWeek(day, month, year) {
+    let dayIndex = new Date(`${year}/${month}/${day}`).getDay();
+
+    let tillWeekEnd = await loopTillValue(dayIndex, 6, '>');
+    let tillWeekStart = await loopTillValue(dayIndex, 0, '<');
+
+    let firstDay = day + tillWeekEnd;
+    let secondDay = day - tillWeekStart;
+
+    let firstMonth = month;
+    let secondMonth = month;
+
+    let firstYear = year;
+    let secondYear = year;
+
+    if (firstDay > getDaysInMonth(firstMonth, firstYear)) {
+        firstMonth = month + 1;
+        if (firstMonth > 12) {
+            firstMonth = 1;
+            firstYear += 1;
+        }
+        firstDay = firstDay - getDaysInMonth(firstMonth - 1, firstYear);
+    }
+
+    if (secondDay < 1) {
+        secondMonth -= 1;
+        if (secondMonth < 1) {
+            secondMonth = 12;
+            secondYear -= 1;
+        }
+        secondDay = getDaysInMonth(secondMonth, secondYear) + secondDay;
+    }
+
+    return [firstYear, firstMonth, firstDay, secondYear, secondMonth, secondDay];
 }

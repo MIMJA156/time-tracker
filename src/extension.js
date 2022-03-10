@@ -21,7 +21,7 @@ global.item = null;
  * @returns {[year, month, day, hour, minute, sec, today]}
  */
 global.currentTime = () => {
-	const today = new Date(`2022/03/30`);
+	const today = new Date();
 	const yyyy = today.getFullYear();
 	const mm = today.getMonth() + 1;
 	const dd = today.getDate();

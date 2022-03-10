@@ -63,7 +63,7 @@ function updateChart(timeData) {
     } else {
         try {
             chart = new Chart($('#chart'), {
-                type: 'line',
+                type: 'bar',
                 data: {
                     labels: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday',
                         'Saturday'
@@ -92,6 +92,11 @@ function updateChart(timeData) {
                                     if (hours > 1) h_s = `${h_s}s`;
                                     if (minutes > 1) m_s = `${m_s}s`;
 
+                                    if (h_s == '' && m_s == '') {
+                                        m_s = '0 min';
+                                        h_s = '0 hr';
+                                    }
+
                                     return `${h_s} ${m_s}`;
                                 }
                             }
@@ -111,6 +116,7 @@ function updateChart(timeData) {
             $('#current-date').text(timeData.current);
         } catch (err) {
             postError('Unknown Error Occurred.');
+            console.log(err);
         }
     }
 }
