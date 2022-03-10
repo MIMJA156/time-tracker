@@ -21,7 +21,7 @@ function bootServer() {
     });
 
     app.get('/api/initial-data', async (req, res) => {
-        const parsed = JSON.parse(fs.readFileSync(`${__dirname}/../../${global.fileDir}/${global.fileName}.json`, 'utf8'));
+        const parsed = JSON.parse(fs.readFileSync(`${__dirname}/../../${file.dir}/${file.name}.json`, 'utf8'));
 
         let graphDataChanged = {
             current: "L"
@@ -49,10 +49,11 @@ function bootServer() {
 
         let currentWeek = [];
 
-        console.log(currentDayIndex);
-
         let tillCurrentWeekEnd = await loopTillValue(currentDayIndex, 6, '>');
         let tillCurrentWeekStart = await loopTillValue(currentDayIndex, 0, '<');
+
+        let firstCurrentDay = currentRecordedDay + tillCurrentWeekEnd;
+        let secondCurrentDay = getDaysInMonth(currentRecordedMonth - 1, currentRecordedYear) + (currentRecordedDay - tillCurrentWeekStart);
 
         let lastWeek = [];
 
