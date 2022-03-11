@@ -82,7 +82,6 @@ function bootServer() {
             }
         }
 
-        console.log(graphDataChanged);
         res.send(graphDataChanged);
     });
 
@@ -144,6 +143,13 @@ async function loopTillValue(val, till, sign) {
     return await isDone;
 }
 
+/**
+ * This will let you know what week a certain date is in.
+ * @param {number} day 
+ * @param {number} month 
+ * @param {number} year 
+ * @returns {array} all the dates for the two dates that make up the week.
+ */
 async function dateToWeek(day, month, year) {
     let dayIndex = new Date(`${year}/${month}/${day}`).getDay();
 
