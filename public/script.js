@@ -2,7 +2,7 @@
 let chartMade = false;
 let chart;
 let timeObject;
-let currentButton = null;
+let currentButton;
 
 //Real Code
 
@@ -47,22 +47,76 @@ $.ajax({
 });
 
 $('.l').on('click', () => {
-    if (!$('.l').hasClass('crossed-out')) {
-        move('l');
-    }
+    if ($('.l').hasClass('crossed-out')) return;
+    if (currentButton == 'r' && $('.r').hasClass('crossed-out')) move('l', true);
+    currentButton = 'l';
+    move('l', true);
 });
 
 $('.r').on('click', () => {
-    if (!$('.r').hasClass('crossed-out')) {
-        move('r');
-    }
+    if ($('.r').hasClass('crossed-out')) return;
+    if (currentButton == 'l' && $('.l').hasClass('crossed-out')) move('r', true);
+    currentButton = 'r';
+    move('r', true);
 });
 
-function move(pos) {
+function move(pos, type) {
     let current = timeObject.current.split('/')[0].split('-').concat(timeObject.current.split('/')[1].split('-')).map(x => parseInt(x));
 
-    console.log(current);
-    console.log(pos);
+    if (pos === 'r') {
+        current[2] += 7;
+        if (current[2] > getDaysInMonth(current[1], current[0])) {
+            current[2] -= getDaysInMonth(current[1], current[0]);
+            current[1]++;
+            if (current[1] > 12) {
+                current[1] -= 12;
+                current[0]++;
+            }
+        }
+
+        current[5] += 7;
+        if (current[5] > getDaysInMonth(current[4], current[3])) {
+            current[5] -= getDaysInMonth(current[4], current[3]);
+            current[4]++;
+            if (current[4] > 12) {
+                current[4] -= 12;
+                current[3]++;
+            }
+        }
+    } else if (pos === 'l') {
+        current[2] -= 7;
+        if (current[2] < 1) {
+            current[1]--;
+            if (current[1] < 1) {
+                current[0]--;
+                current[1] = 12;
+            }
+            current[2] = getDaysInMonth(current[1], current[0]) + current[2];
+        }
+
+        current[5] -= 7;
+        if (current[5] < 1) {
+            current[4]--;
+            if (current[4] < 1) {
+                current[3]--;
+                current[4] = 12;
+            }
+            current[5] = getDaysInMonth(current[4], current[3]) + current[5];
+        }
+    }
+
+    if (timeObject[`${current[0]}-${current[1]}-${current[2]}/${current[3]}-${current[4]}-${current[5]}`] === undefined) {
+        $(`.${pos}`).addClass('crossed-out');
+    } else {
+        $(`.${pos}`).removeClass('crossed-out');
+    }
+
+    if (type) {
+        timeObject.current = `${current[0]}-${current[1]}-${current[2]}/${current[3]}-${current[4]}-${current[5]}`;
+        move((pos === 'r') ? 'l' : 'r', false);
+    }
+
+    updateChart(timeObject);
 }
 
 /**
@@ -70,11 +124,12 @@ function move(pos) {
  */
 function updateChart(timeData) {
     if (chartMade) {
-        chart.data.datasets[0].data = timeData[timeData.current].active;
-        console.log(chart.options.plugins.tooltip.callbacks.label);
+        console.log("Updating chart...");
+        $('#current-date').text(timeData.current);
+        chart.options.plugins.tooltip.callbacks.label = chart.options.plugins.tooltip.callbacks.label;
+        chart.data.datasets[0].data = timeData[timeData.current].active
         chart.update();
     } else {
-        console.log(timeData);
         try {
             chart = new Chart($('#chart'), {
                 type: 'bar',
