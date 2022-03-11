@@ -2,7 +2,7 @@
 let chartMade = false;
 let chart;
 let timeObject;
-let positionInTime = 1;
+let currentButton = null;
 
 //Real Code
 
@@ -47,72 +47,22 @@ $.ajax({
 });
 
 $('.l').on('click', () => {
-    console.log("left");
-    move('l', true);
+    if (!$('.l').hasClass('crossed-out')) {
+        move('l');
+    }
 });
 
 $('.r').on('click', () => {
-    console.log("right");
-    move('r', true);
+    if (!$('.r').hasClass('crossed-out')) {
+        move('r');
+    }
 });
 
-function move(pos, type) {
+function move(pos) {
     let current = timeObject.current.split('/')[0].split('-').concat(timeObject.current.split('/')[1].split('-')).map(x => parseInt(x));
 
-    if (pos === 'r') {
-        current[2] += 7;
-        if (current[2] > getDaysInMonth(current[1], current[0])) {
-            current[2] -= getDaysInMonth(current[1], current[0]);
-            current[1]++;
-            if (current[1] > 12) {
-                current[1] -= 12;
-                current[0]++;
-            }
-        }
-
-        current[5] += 7;
-        if (current[5] > getDaysInMonth(current[4], current[3])) {
-            current[5] -= getDaysInMonth(current[4], current[3]);
-            current[4]++;
-            if (current[4] > 12) {
-                current[4] -= 12;
-                current[3]++;
-            }
-        }
-    } else if (pos === 'l') {
-        current[2] -= 7;
-        if (current[2] < 1) {
-            current[1]--;
-            current[2] = getDaysInMonth(current[1], current[0]);
-            if (current[1] < 1) {
-                current[0]--;
-                current[1] = 12;
-            }
-        }
-
-        current[5] -= 7;
-        if (current[5] < 1) {
-            current[4]--;
-            current[5] = getDaysInMonth(current[4], current[3]);
-            if (current[4] < 1) {
-                current[3]--;
-                current[4] = 12;
-            }
-        }
-    }
-
     console.log(current);
-
-    if (timeObject[`${current[0]}-${current[1]}-${current[2]}/${current[3]}-${current[4]}-${current[5]}`] === undefined) {
-        $(`.${pos}`).addClass('crossed-out');
-    } else {
-        $(`.${pos}`).removeClass('crossed-out');
-    }
-
-    if (type) {
-        timeObject.current = `${current[0]}-${current[1]}-${current[2]}/${current[3]}-${current[4]}-${current[5]}`;
-        move((pos === 'l') ? 'r' : 'l', false);
-    }
+    console.log(pos);
 }
 
 /**
@@ -120,8 +70,11 @@ function move(pos, type) {
  */
 function updateChart(timeData) {
     if (chartMade) {
-        console.log("Updating chart...");
+        chart.data.datasets[0].data = timeData[timeData.current].active;
+        console.log(chart.options.plugins.tooltip.callbacks.label);
+        chart.update();
     } else {
+        console.log(timeData);
         try {
             chart = new Chart($('#chart'), {
                 type: 'bar',
