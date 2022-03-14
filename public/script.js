@@ -2,7 +2,8 @@
 let chartMade = false;
 let chart;
 let timeObject;
-let currentButton;
+let elin = 0;
+let shadowElin = 0;
 
 //Real Code
 
@@ -27,9 +28,31 @@ $.ajax({
                     method: 'GET',
                     success: (t) => {
                         timeObject = t;
-                        updateChart(t);
+                        updateChart();
                         move('r', false);
                         move('l', false);
+
+                        setInterval(() => {
+                            $('#statues-text').text('Querying Update Data...');
+                            setTimeout(() => {
+                                $.ajax({
+                                    url: `http://localhost:${document.location.port}/api/update-data`,
+                                    method: 'GET',
+                                    success: (t) => {
+                                        $('#statues-text').text('Ready');
+                                        timeObject[t.current].active = t.time;
+                                        if (elin === 0) {
+                                            updateChart();
+                                            move('r', false);
+                                            move('l', false);
+                                        }
+                                    },
+                                    error: () => {
+                                        postError('Server Error while Updating.');
+                                    }
+                                })
+                            }, getRandomTimeout());
+                        }, 15 * 1000);
                     },
                     error: () => {
                         postError('Server Error.');
@@ -48,19 +71,15 @@ $.ajax({
 
 $('.l').on('click', () => {
     if ($('.l').hasClass('crossed-out')) return;
-    if (currentButton == 'r' && $('.r').hasClass('crossed-out')) move('l', true);
-    currentButton = 'l';
     move('l', true);
 });
 
 $('.r').on('click', () => {
     if ($('.r').hasClass('crossed-out')) return;
-    if (currentButton == 'l' && $('.l').hasClass('crossed-out')) move('r', true);
-    currentButton = 'r';
     move('r', true);
 });
 
-function move(pos, type) {
+function move(pos, more) {
     let current = timeObject.current.split('/')[0].split('-').concat(timeObject.current.split('/')[1].split('-')).map(x => parseInt(x));
 
     if (pos === 'r') {
@@ -105,29 +124,49 @@ function move(pos, type) {
         }
     }
 
-    if (timeObject[`${current[0]}-${current[1]}-${current[2]}/${current[3]}-${current[4]}-${current[5]}`] === undefined) {
-        $(`.${pos}`).addClass('crossed-out');
-    } else {
-        $(`.${pos}`).removeClass('crossed-out');
+    shadowElin = Object.keys(timeObject).length - 2;
+
+    if (pos === 'r') {
+        elin--;
+    } else if (pos === 'l') {
+        elin++;
     }
 
-    if (type) {
+    if (elin === 0) {
+        $('.r').addClass('crossed-out');
+        $(`.l`).removeClass('crossed-out');
+    }
+
+    if (elin === shadowElin) {
+        $(`.l`).addClass('crossed-out');
+        $(`.r`).removeClass('crossed-out');
+    }
+
+    if (elin !== shadowElin && elin !== 0) {
+        $(`.l`).removeClass('crossed-out');
+        $(`.r`).removeClass('crossed-out');
+    }
+
+    if (elin === shadowElin && elin === 0) {
+        $(`.l`).addClass('crossed-out');
+        $(`.r`).addClass('crossed-out');
+    }
+
+    if (more) {
         timeObject.current = `${current[0]}-${current[1]}-${current[2]}/${current[3]}-${current[4]}-${current[5]}`;
-        move((pos === 'r') ? 'l' : 'r', false);
+        updateChart(timeObject);
     }
-
-    updateChart(timeObject);
 }
 
 /**
  * This function initiates/updates the chart.
  */
-function updateChart(timeData) {
+function updateChart() {
     if (chartMade) {
         console.log("Updating chart...");
-        $('#current-date').text(timeData.current);
+        $('#current-date').text(timeObject.current);
         chart.options.plugins.tooltip.callbacks.label = chart.options.plugins.tooltip.callbacks.label;
-        chart.data.datasets[0].data = timeData[timeData.current].active
+        chart.data.datasets[0].data = timeObject[timeObject.current].active
         chart.update();
     } else {
         try {
@@ -139,7 +178,7 @@ function updateChart(timeData) {
                     ],
                     datasets: [{
                         label: 'Time Spent Coding This Week',
-                        data: timeData[timeData.current].active,
+                        data: timeObject[timeObject.current].active,
                         backgroundColor: [
                             'rgba(255, 99, 132, 0.2)',
                             'rgba(255, 159, 64, 0.2)',
@@ -166,9 +205,9 @@ function updateChart(timeData) {
                         tooltip: {
                             callbacks: {
                                 label: function (context) {
-                                    let hours = `${(timeData[timeData.current].active[context.dataIndex] / 60) /
+                                    let hours = `${(timeObject[timeObject.current].active[context.dataIndex] / 60) /
                                 60}`.split('.')[0];
-                                    let minutes = `${((timeData[timeData.current].active[context.dataIndex] / 60) - (hours *
+                                    let minutes = `${((timeObject[timeObject.current].active[context.dataIndex] / 60) - (hours *
                                 60))}`.split('.')[0];
 
                                     let h_s = `${hours} hr`;
@@ -180,8 +219,8 @@ function updateChart(timeData) {
                                     if (minutes > 1) m_s = `${m_s}s`;
 
                                     if (h_s == '' && m_s == '') {
-                                        m_s = '0 min';
-                                        h_s = '0 hr';
+                                        h_s = ' Less than';
+                                        m_s = '1 min';
                                     }
 
                                     return `${h_s} ${m_s}`;
@@ -200,7 +239,7 @@ function updateChart(timeData) {
             chartMade = true;
             $('#loading-img').css('display', 'none');
             $('#statues-text').text('Ready');
-            $('#current-date').text(timeData.current);
+            $('#current-date').text(timeObject.current);
         } catch (err) {
             postError('Unknown Error Occurred.');
             console.log(err);

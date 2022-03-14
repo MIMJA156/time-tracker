@@ -23,9 +23,7 @@ function bootServer() {
     app.get('/api/initial-data', async (req, res) => {
         const parsed = JSON.parse(fs.readFileSync(`${__dirname}/../../${file.dir}/${file.name}.json`, 'utf8'));
 
-        let graphDataChanged = {
-            current: "L"
-        };
+        let graphDataChanged = {};
 
         let firstRecordedYear = parseFloat(Object.keys(parsed)[Object.keys(parsed).length - Object.keys(parsed).length]);
         let firstRecordedMonth = parseFloat(Object.keys(parsed[firstRecordedYear])[Object.keys(parsed[firstRecordedYear]).length - Object.keys(parsed[firstRecordedYear]).length]);
@@ -50,43 +48,95 @@ function bootServer() {
 
         let array = [];
         let temp = [...currentWeek];
-        for (let i = 1; i < DifferenceInDays; i++) {
+        let temp2 = [...currentWeek];
+        for (let i = 1; i < DifferenceInDays + 1; i++) {
             try {
                 array.push(parsed[temp[0]][temp[1]][temp[2]].active);
             } catch (e) {
                 array.push(0);
             }
 
-            temp[2] -= 1;
-            if (temp[2] < 1) {
-                temp[1] -= 1;
-                temp[2] = getDaysInMonth(temp[1], temp[0]);
-            }
-
-            if (i / 7 === Math.floor(i / 7)) {
-                graphDataChanged[`${currentWeek[0]}-${currentWeek[1]}-${currentWeek[2]}/${currentWeek[3]}-${currentWeek[4]}-${currentWeek[5]}`] = {};
-                graphDataChanged[`${currentWeek[0]}-${currentWeek[1]}-${currentWeek[2]}/${currentWeek[3]}-${currentWeek[4]}-${currentWeek[5]}`].active = array;
+            if (i / 7 == Math.floor(i / 7)) {
+                graphDataChanged[`${temp2[0]}-${temp2[1]}-${temp2[2]}/${temp2[3]}-${temp2[4]}-${temp2[5]}`] = {};
+                graphDataChanged[`${temp2[0]}-${temp2[1]}-${temp2[2]}/${temp2[3]}-${temp2[4]}-${temp2[5]}`].active = array.reverse();
                 array = [];
 
-                currentWeek[2] -= 7;
-                if (currentWeek[2] < 1) {
-                    currentWeek[1]--;
-                    currentWeek[2] = getDaysInMonth(currentWeek[1], currentWeek[0]) + currentWeek[2];
+                temp2[2] -= 7;
+                if (temp2[2] < 1) {
+                    temp2[1]--;
+                    if (temp2[1] < 1) {
+                        temp2[0]--;
+                        temp2[1] = 12;
+                    }
+                    temp2[2] = getDaysInMonth(temp2[1], temp2[0]) + temp2[2];
                 }
 
-                currentWeek[5] -= 7;
-                if (currentWeek[5] < 1) {
-                    currentWeek[4]--;
-                    currentWeek[5] = getDaysInMonth(currentWeek[4], currentWeek[3]) + currentWeek[5];
+                temp2[5] -= 7;
+                if (temp2[5] < 1) {
+                    temp2[4]--;
+                    if (temp2[4] < 1) {
+                        temp2[3]--;
+                        temp2[4] = 12;
+                    }
+                    temp2[5] = getDaysInMonth(temp2[4], temp2[3]) + temp2[5];
                 }
             }
+
+            temp[2]--;
+            if (temp[2] < 1) {
+                temp[1]--;
+                if (temp[1] < 1) {
+                    temp[0]--;
+                    temp[1] = 12;
+                }
+                temp[2] = getDaysInMonth(temp[1], temp[0]) + temp[2];
+            }
         }
+
+        console.log(currentWeek);
+        console.log(graphDataChanged);
+        console.log(parsed);
 
         res.send(graphDataChanged);
     });
 
-    app.get('/api/update-data', (req, res) => {
-        res.send("HALLOO");
+    app.get('/api/update-data', async (req, res) => {
+        const parsed = JSON.parse(fs.readFileSync(`${__dirname}/../../${file.dir}/${file.name}.json`, 'utf8'));
+
+        let newData = {
+            current: '',
+            time: []
+        };
+
+        let currentRecordedYear = parseFloat(Object.keys(parsed)[Object.keys(parsed).length - 1]);
+        let currentRecordedMonth = parseFloat(Object.keys(parsed[currentRecordedYear])[Object.keys(parsed[currentRecordedYear]).length - 1]);
+        let currentRecordedDay = parseFloat(Object.keys(parsed[currentRecordedYear][currentRecordedMonth])[Object.keys(parsed[currentRecordedYear][currentRecordedMonth]).length - 1]);
+
+        let currentWeek = await dateToWeek(currentRecordedDay, currentRecordedMonth, currentRecordedYear);
+
+        newData.current = `${currentWeek[0]}-${currentWeek[1]}-${currentWeek[2]}/${currentWeek[3]}-${currentWeek[4]}-${currentWeek[5]}`;
+
+        for (let i = 0; i < 7; i++) {
+            try {
+                newData.time.push(parsed[currentWeek[0]][currentWeek[1]][currentWeek[2]].active);
+            } catch (e) {
+                newData.time.push(0);
+            }
+
+            currentWeek[2]--;
+            if (currentWeek[2] < 1) {
+                currentWeek[1]--;
+                if (currentWeek[1] < 1) {
+                    currentWeek[0]--;
+                    currentWeek[1] = 12;
+                }
+                currentWeek[2] = getDaysInMonth(currentWeek[1], currentWeek[0]) + currentWeek[2];
+            }
+        }
+
+        newData.time = newData.time.reverse();
+
+        res.send(newData);
     });
 
     app.listen(port, () => {
