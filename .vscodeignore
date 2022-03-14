@@ -1,12 +1,7 @@
+node_modules/**
 .vscode/**
-.vscode-test/**
-test/**
-.gitignore
-.yarnrc
-vsc-extension-quickstart.md
-**/jsconfig.json
-**/*.map
-**/.eslintrc.json
 archive/**
 src/**
-node_modules/**
+jsconfig.json
+package-lock.json
+.gitignore

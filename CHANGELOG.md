@@ -94,3 +94,6 @@ All Changes made are logged in this file.
 - Added a webpage to view your data in a graph (finally, after many tears)
 - Increased Cat Coding Gif Size
 - Probably added some bugs too
+
+###### 2.0.1
+- added a new (better) image for the extension
