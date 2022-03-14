@@ -20,12 +20,41 @@
         <img id="loading-img-dis" src="./SVGS/loading.svg">
     </dic>
     <div class="bottom-bar">
+        <button id="open-settings"><img src="./SVGS/gear.svg"></button>
         <div id="connection-statues-container">
             <img id="statues-img" src="./SVGS/connecting-1.svg">
             <span id="statues-text">Connecting...</span>
         </div>
     </div>
+
+    <div id="settings-menu-body">
+        <div id="settings-header">
+            <span>Settings</span>
+            <button id="close-settings"><img src="./SVGS/failed.svg"></button>
+        </div>
+        <div id="settings-body">
+            <div class="settings-cell">
+                <div class="settings-body-left">
+                    <span>Graph Type</span>
+                </div>
+                <div class="settings-body-right">
+                    <input type="radio" name="graph-type" id="line-graph" value="line">
+                    <label for="line-graph">Line Graph</label>
+                    <br>
+                    <input type="radio" name="graph-type" id="bar-graph" value="bar" checked>
+                    <label for="bar-graph">Bar Graph</label>
+                </div>
+            </div>
+            <div class="settings-cell">
+                Thank you for downloading my extension!
+            </div>
+        </div>
+        <div id="settings-footer">
+            <span>There will be more settings in the future...</span>
+        </div>
+    </div>
 </body>
-<script src="./script.js"></script>
+<script src="./graphing.js"></script>
+<script src="./settings.js"></script>
 
 </html>

@@ -4,6 +4,7 @@ let chart;
 let timeObject;
 let elin = 0;
 let shadowElin = 0;
+let graphType = 'lol';
 
 //Real Code
 let count = 1;
@@ -16,7 +17,8 @@ let connectingInterval = setInterval(() => {
 $.ajax({
     url: `http://localhost:${document.location.port}/api`,
     method: 'GET',
-    success: () => {
+    success: (settings) => {
+        graphType = settings.web.graph.type;
         setTimeout(() => {
             clearInterval(connectingInterval);
             $('#statues-img').attr('src', `./SVGS/succeeded.svg`);
@@ -28,11 +30,12 @@ $.ajax({
                     success: (t) => {
                         timeObject = t;
                         updateChart();
+                        windowIsReady();
                         move('r', false);
                         move('l', false);
 
                         setInterval(() => {
-                            $('#statues-text').text('Querying Update Data...');
+                            $('#statues-text').text('Updating...');
                             setTimeout(() => {
                                 $.ajax({
                                     url: `http://localhost:${document.location.port}/api/update-data`,
@@ -164,19 +167,20 @@ function updateChart() {
     if (chartMade) {
         $('#current-date').text(timeObject.current);
         chart.options.plugins.tooltip.callbacks.label = chart.options.plugins.tooltip.callbacks.label;
-        chart.data.datasets[0].data = timeObject[timeObject.current].active
+        chart.data.datasets[0].data = timeObject[timeObject.current].active.map(x => x / 60);
         chart.update();
     } else {
         try {
             chart = new Chart($('#chart'), {
-                type: 'bar',
+                type: graphType,
                 data: {
                     labels: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday',
                         'Saturday'
                     ],
                     datasets: [{
                         label: 'Time Spent Coding This Week',
-                        data: timeObject[timeObject.current].active,
+                        tension: 0.1,
+                        data: timeObject[timeObject.current].active.map(x => x / 60),
                         backgroundColor: [
                             'rgba(255, 99, 132, 0.2)',
                             'rgba(255, 159, 64, 0.2)',
@@ -243,6 +247,11 @@ function updateChart() {
             console.log(err);
         }
     }
+}
+
+function destroyChart() {
+    chart.destroy();
+    chartMade = false;
 }
 
 /**

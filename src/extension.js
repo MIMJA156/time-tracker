@@ -89,6 +89,17 @@ function activate(context) {
 
 	context.subscriptions.push(vscode.commands.registerCommand(showCatCommand, showCat));
 	context.subscriptions.push(vscode.commands.registerCommand(showGraphCommand, showOnWeb));
+
+	// Create the settings json file if it does not exist.
+	if (!fs.existsSync(`${__dirname}/../../${file.dir}/settings.json`)) {
+		fs.writeFileSync(`${__dirname}/../../${file.dir}/settings.json`, JSON.stringify({
+			"web": {
+				"graph": {
+					"type": "bar",
+				}
+			}
+		}));
+	}
 }
 
 async function showOnWeb() {
