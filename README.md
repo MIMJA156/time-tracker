@@ -5,4 +5,4 @@
 ## Features
 
 This simply will track the amount of time you spend coding per day.
-Allows you to view the data in a user friendly way.
+Allows you to view the data in a user friendly way by clicking on the time tracking badge.
