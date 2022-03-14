@@ -33,9 +33,6 @@ function bootServer() {
         let currentRecordedMonth = parseFloat(Object.keys(parsed[currentRecordedYear])[Object.keys(parsed[currentRecordedYear]).length - 1]);
         let currentRecordedDay = parseFloat(Object.keys(parsed[currentRecordedYear][currentRecordedMonth])[Object.keys(parsed[currentRecordedYear][currentRecordedMonth]).length - 1]);
 
-        console.log(`First year: ${firstRecordedYear}/${firstRecordedMonth}/${firstRecordedDay}`);
-        console.log(`Current Date: ${currentRecordedYear}/${currentRecordedMonth}/${currentRecordedDay}`);
-
         let currentWeek = await dateToWeek(currentRecordedDay, currentRecordedMonth, currentRecordedYear);
         let firstWeek = await dateToWeek(firstRecordedDay, firstRecordedMonth, firstRecordedYear);
 
@@ -92,10 +89,6 @@ function bootServer() {
                 temp[2] = getDaysInMonth(temp[1], temp[0]) + temp[2];
             }
         }
-
-        console.log(currentWeek);
-        console.log(graphDataChanged);
-        console.log(parsed);
 
         res.send(graphDataChanged);
     });

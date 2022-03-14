@@ -6,7 +6,6 @@ let elin = 0;
 let shadowElin = 0;
 
 //Real Code
-
 let count = 1;
 let connectingInterval = setInterval(() => {
     count++;
@@ -163,7 +162,6 @@ function move(pos, more) {
  */
 function updateChart() {
     if (chartMade) {
-        console.log("Updating chart...");
         $('#current-date').text(timeObject.current);
         chart.options.plugins.tooltip.callbacks.label = chart.options.plugins.tooltip.callbacks.label;
         chart.data.datasets[0].data = timeObject[timeObject.current].active
