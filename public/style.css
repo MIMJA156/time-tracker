@@ -182,3 +182,13 @@ body {
     float: right;
     width: 50%;
 }
+
+#reset-settings-pos {
+    float: left;
+    height: 100%;
+    width: 50px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    display: none;
+}
