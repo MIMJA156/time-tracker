@@ -1,3 +1,5 @@
+let shown = false;
+
 function windowIsReady() {
     console.log('Window is ready.');
     if (graphType == 'line') {
@@ -9,8 +11,14 @@ function windowIsReady() {
     $('#open-settings').on('click', () => {
         if ($('#settings-menu-body').css('display') === 'flex') {
             $('#settings-menu-body').css('display', 'none');
+            if (shown) {
+                $('#reset-settings-pos').css('display', 'none');
+            }
         } else {
             $('#settings-menu-body').css('display', 'flex');
+            if (shown) {
+                $('#reset-settings-pos').css('display', 'block');
+            }
         }
     });
 
@@ -34,8 +42,6 @@ function windowIsReady() {
 
     //Make settings draggable
     dragElement(document.getElementById("settings-menu-body"));
-
-    let shown = false;
 
     function dragElement(elmnt) {
         var pos1 = 0,

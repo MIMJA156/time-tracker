@@ -94,13 +94,24 @@ body {
     text-decoration: line-through;
 }
 
-#open-settings {
+#open-settings,
+#reset-settings-pos {
     float: left;
     height: 100%;
     width: 50px;
     border: none;
     background: transparent;
     cursor: pointer;
+}
+
+#reset-settings-pos {
+    display: none;
+}
+
+#reset-settings-pos {
+    float: right;
+    padding-right: 10px;
+    width: 70px;
 }
 
 #settings-menu-body {
@@ -181,14 +192,4 @@ body {
 .settings-body-right {
     float: right;
     width: 50%;
-}
-
-#reset-settings-pos {
-    float: left;
-    height: 100%;
-    width: 50px;
-    border: none;
-    background: transparent;
-    cursor: pointer;
-    display: none;
 }
