@@ -100,3 +100,6 @@ All Changes made are logged in this file.
 
 ###### 2.5.0
 - added a settings page for the webpage
+
+###### 2.5.1
+- removed broken code
