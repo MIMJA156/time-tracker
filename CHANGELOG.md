@@ -97,3 +97,6 @@ All Changes made are logged in this file.
 
 ###### 2.0.1
 - added a new (better) image for the extension
+
+###### 2.5.0
+- added a settings page for the webpage
