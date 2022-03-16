@@ -51,6 +51,7 @@ $.ajax({
                                     },
                                     error: () => {
                                         postError('Server Error while Updating.');
+                                        destroyChart();
                                     }
                                 })
                             }, getRandomTimeout());
@@ -200,6 +201,8 @@ function updateChart() {
                             'rgb(201, 203, 207)'
                         ],
                         borderWidth: 1,
+                        pointRadius: 10,
+                        pointHoverRadius: 15,
                     }]
                 },
                 options: {
@@ -258,10 +261,13 @@ function destroyChart() {
  * Call an error to be displayed.
  */
 function postError(errMsg) {
+    $('#loading-img').css('display', 'flex');
     $('#statues-img').attr('src', `./SVGS/failed.svg`);
     $('#loading-img-dis').attr('src', `./SVGS/failed.svg`);
     $('#statues-text').text(errMsg);
     $('#current-date').text('Undefined');
+    $(`.l`).addClass('crossed-out');
+    $(`.r`).addClass('crossed-out');
 }
 
 /**

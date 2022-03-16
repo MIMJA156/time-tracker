@@ -24,6 +24,7 @@ function windowIsReady() {
 
     $('#close-settings').on('click', () => {
         $('#settings-menu-body').css('display', 'none');
+        $('#reset-settings-pos').css('display', 'none');
     });
 
     $('#line-graph').on('click', () => {

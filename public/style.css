@@ -109,7 +109,7 @@ body {
 }
 
 #reset-settings-pos {
-    float: right;
+    float: left;
     padding-right: 10px;
     width: 70px;
 }
@@ -146,6 +146,7 @@ body {
 #settings-header {
     top: 0;
     left: 0;
+    cursor: move;
 }
 
 #settings-header>span {
