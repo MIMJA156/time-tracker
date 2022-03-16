@@ -25,14 +25,14 @@ function bootServer() {
 
     app.get('/api', (req, res) => {
         res.send(JSON.parse(fs.readFileSync(`${__dirname}/../../${file.dir}/settings.json`)));
-        pingIdle()
+        // pingIdle()
     });
 
     app.post('/api/update-settings', (req, res) => {
         let settings = JSON.parse(fs.readFileSync(`${__dirname}/../../${file.dir}/settings.json`));
         settings.web.graph.type = req.body.graphType;
         fs.writeFileSync(`${__dirname}/../../${file.dir}/settings.json`, JSON.stringify(settings));
-        pingIdle()
+        // pingIdle()
     });
 
     app.get('/api/initial-data', async (req, res) => {
@@ -106,7 +106,7 @@ function bootServer() {
         }
 
         res.send(graphDataChanged);
-        pingIdle()
+        // pingIdle()
     });
 
     app.get('/api/update-data', async (req, res) => {
@@ -145,7 +145,7 @@ function bootServer() {
 
         newData.time = newData.time.reverse();
 
-        pingIdle();
+        // pingIdle();
 
         res.send(newData);
     });
@@ -157,13 +157,13 @@ function bootServer() {
 
     let timeout;
 
-    function pingIdle() {
-        clearTimeout(timeout);
-        timeout = setTimeout(() => {
-            a.close();
-            running = false;
-        }, 1 * 60 * 1000);
-    }
+    // function pingIdle() {
+    //     clearTimeout(timeout);
+    //     timeout = setTimeout(() => {
+    //         a.close();
+    //         running = false;
+    //     }, 1 * 60 * 1000);
+    // }
 }
 
 //Useful functions.
