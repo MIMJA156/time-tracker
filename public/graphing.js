@@ -299,6 +299,10 @@ function getDaysInMonth(month, year) {
     return new Date(year, month, 0).getDate();
 };
 
+/**
+ * This function will define the current percent of sanity.
+ * @param {number} hoursInTotal 
+ */
 function defineCurrentSanity(hoursInTotal) {
     let maxSanity = 100;
     let sanity = maxSanity;
