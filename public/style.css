@@ -104,6 +104,16 @@ body {
     cursor: pointer;
 }
 
+#sanity-container {
+    float: right;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-right: 10px;
+    font-size: larger;
+}
+
 #reset-settings-pos {
     display: none;
     float: left;

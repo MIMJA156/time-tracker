@@ -30,6 +30,7 @@ $.ajax({
                     success: (t) => {
                         timeObject = t;
                         updateChart();
+                        defineCurrentSanity(timeObject);
                         windowIsReady();
                         move('r', false);
                         move('l', false);
@@ -41,6 +42,7 @@ $.ajax({
                                     url: `http://localhost:${document.location.port}/api/update-data`,
                                     method: 'GET',
                                     success: (t) => {
+                                        defineCurrentSanity(timeObject);
                                         $('#statues-text').text('Ready');
                                         timeObject[t.current].active = t.time;
                                         if (elin === 0) {
@@ -75,11 +77,13 @@ $.ajax({
 $('.l').on('click', () => {
     if ($('.l').hasClass('crossed-out')) return;
     move('l', true);
+    defineCurrentSanity(timeObject);
 });
 
 $('.r').on('click', () => {
     if ($('.r').hasClass('crossed-out')) return;
     move('r', true);
+    defineCurrentSanity(timeObject);
 });
 
 function move(pos, more) {
@@ -286,3 +290,15 @@ function getRandomTimeout() {
 function getDaysInMonth(month, year) {
     return new Date(year, month, 0).getDate();
 };
+
+function defineCurrentSanity(hoursInTotal) {
+    let maxSanity = 100;
+    let sanity = maxSanity;
+    let totalTime = hoursInTotal[hoursInTotal.current].active.reduce((partialSum, a) => partialSum + a, 0);
+
+    sanity = sanity - Math.floor((totalTime / 60) / 30);
+
+    console.log(sanity, maxSanity);
+
+    $('#sanity-percent').text(`${(sanity/maxSanity) * 100}`);
+}
