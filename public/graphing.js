@@ -172,7 +172,11 @@ function updateChart() {
     if (chartMade) {
         $('#current-date').text(timeObject.current);
         chart.options.plugins.tooltip.callbacks.label = chart.options.plugins.tooltip.callbacks.label;
-        chart.data.datasets[0].data = timeObject[timeObject.current].active.map(x => x / 60);
+        chart.data.datasets[0].data = timeObject[timeObject.current].active.map(x => {
+            x = Math.floor(x / 60);
+            if (x < 1) x = 0;
+            return x;
+        });
         chart.update();
     } else {
         try {
@@ -185,7 +189,11 @@ function updateChart() {
                     datasets: [{
                         label: 'Time Spent Coding This Week',
                         tension: 0.1,
-                        data: timeObject[timeObject.current].active.map(x => x / 60),
+                        data: timeObject[timeObject.current].active.map(x => {
+                            x = Math.floor(x / 60);
+                            if (x < 1) x = 0;
+                            return x;
+                        }),
                         backgroundColor: [
                             'rgba(255, 99, 132, 0.2)',
                             'rgba(255, 159, 64, 0.2)',
@@ -228,8 +236,8 @@ function updateChart() {
                                     if (minutes > 1) m_s = `${m_s}s`;
 
                                     if (h_s == '' && m_s == '') {
-                                        h_s = ' Less than';
-                                        m_s = '1 min';
+                                        h_s = ' No Time Spent';
+                                        m_s = '';
                                     }
 
                                     return `${h_s} ${m_s}`;
@@ -297,8 +305,6 @@ function defineCurrentSanity(hoursInTotal) {
     let totalTime = hoursInTotal[hoursInTotal.current].active.reduce((partialSum, a) => partialSum + a, 0);
 
     sanity = sanity - Math.floor((totalTime / 60) / 30);
-
-    console.log(sanity, maxSanity);
 
     $('#sanity-percent').text(`${(sanity/maxSanity) * 100}`);
 }
