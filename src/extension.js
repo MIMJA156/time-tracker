@@ -2,6 +2,9 @@ const vscode = require('vscode');
 const fs = require('fs');
 const open = require('open');
 const bootServer = require('./server');
+const {
+	file
+} = require('../config.json');
 
 const global = {};
 const cache = {};
@@ -10,11 +13,8 @@ global.json = {};
 global.isIdle = false;
 global.minutesInADay = 1440;
 global.timeTillIdle = 5 * 60 * 1000;
-global.fileDir = "time-tracker-storage-mimja";
-global.fileName = "time.mim";
 global.idleTimeout = null;
-
-module.exports.extensionGlobals = global;
+global.item = null;
 
 /**
  * This functions returns an array containing information about the current local time.
@@ -43,13 +43,11 @@ function activate(context) {
 
 	vscode.workspace.onDidChangeConfiguration(() => {
 		defineCurrentSettings();
+		unIdle();
 
 		if (global.labelPosition !== cache.labelPosition || global.labelPriority !== cache.labelPriority) {
-			vscode.window.showInformationMessage('Reload VSCode to see the changes.', 'Reload').then(selection => {
-				if (selection == 'Reload') {
-					vscode.commands.executeCommand("workbench.action.reloadWindow");
-				}
-			});
+			initiateCountingBadge(context);
+			updateBarItem();
 		}
 
 		if (global.iconString !== cache.iconString) {
@@ -62,36 +60,60 @@ function activate(context) {
 	})
 
 	// create the bar icon
-	global.item = vscode.window.createStatusBarItem(global.labelPosition, global.labelPriority);
-	global.item.command = 'mimjas-time-tracker.timeStatuesItemClicked';
-	context.subscriptions.push(global.item);
-	global.item.show();
+	initiateCountingBadge(context);
 
-	//Listen for command input
-	context.subscriptions.push(vscode.commands.registerCommand('mimjas-time-tracker.timeStatuesItemClicked', async () => {
-		let port = bootServer();
-		await open(`http://localhost:${port}`);
-	}));
+	//Listen for click on the time logger item in the status bar
+	context.subscriptions.push(vscode.commands.registerCommand('mimjas-time-tracker.timeStatuesItemClicked', showOnWeb));
 
 	// Initialize the time counting
 	initializeTimeValues();
 	updateBarItem();
 	initiateCounting();
-	unIdle(69);
+	unIdle();
 
 	// Listen for un-idle events
+	vscode.workspace.onDidOpenTextDocument(openEvent => unIdle(openEvent));
+	vscode.workspace.onDidCloseTextDocument(closeEvent => unIdle(closeEvent));
 	vscode.workspace.onDidChangeTextDocument(changeEvent => unIdle(changeEvent));
 	vscode.workspace.onDidCreateFiles(createEvent => unIdle(createEvent));
 	vscode.workspace.onDidDeleteFiles(deleteEvent => unIdle(deleteEvent));
 	vscode.workspace.onDidRenameFiles(renameEvent => unIdle(renameEvent));
+
 	vscode.window.onDidOpenTerminal(terminal => unIdle(terminal));
 	vscode.window.onDidCloseTerminal(terminal => unIdle(terminal));
 	vscode.window.onDidChangeWindowState(state => unIdle(state));
 
 	//Create any random commands.
-	const command = 'mimjas-time-tracker.showCat';
+	const showCatCommand = 'mimjas-time-tracker.showCat';
+	const showGraphCommand = 'mimjas-time-tracker.showOnWeb';
 
-	context.subscriptions.push(vscode.commands.registerCommand(command, showCat));
+	context.subscriptions.push(vscode.commands.registerCommand(showCatCommand, showCat));
+	context.subscriptions.push(vscode.commands.registerCommand(showGraphCommand, showOnWeb));
+
+	// Create the settings json file if it does not exist.
+	if (!fs.existsSync(`${__dirname}/../../${file.dir}/settings.json`)) {
+		fs.writeFileSync(`${__dirname}/../../${file.dir}/settings.json`, JSON.stringify({
+			"web": {
+				"graph": {
+					"type": "bar",
+				}
+			}
+		}));
+	}
+}
+
+async function showOnWeb() {
+	if (!global.isIdle) {
+		let port = bootServer();
+		await open(`http://localhost:${port}`);
+		// vscode.window.showErrorMessage('This feature has been temporarily disabled due to a bug.');
+	} else {
+		vscode.window.showInformationMessage('Idle mode is currently active. If this idle timer is too short, you can change it in the settings.', 'Change Settings').then((s) => {
+			if (s == 'Change Settings') {
+				vscode.commands.executeCommand('workbench.action.openSettings', 'mimjas-time-tracker');
+			}
+		});
+	}
 }
 
 function updateBarItem() {
@@ -119,13 +141,13 @@ function initializeTimeValues() {
 	let savedTimeJson;
 
 	try {
-		savedTimeJson = fs.readFileSync(`${__dirname}/../${global.fileDir}/${global.fileName}.json`, 'utf8');
+		savedTimeJson = fs.readFileSync(`${__dirname}/../../${file.dir}/${file.name}.json`, 'utf8');
 	} catch (e) {
 		try {
-			fs.mkdirSync(`${__dirname}/../${global.fileDir}/`);
+			fs.mkdirSync(`${__dirname}/../../${file.dir}/`);
 		} catch (e) {};
-		fs.writeFileSync(`${__dirname}/../${global.fileDir}/${global.fileName}.json`, '{}');
-		savedTimeJson = fs.readFileSync(`${__dirname}/../${global.fileDir}/${global.fileName}.json`, 'utf8');
+		fs.writeFileSync(`${__dirname}/../../${file.dir}/${file.name}.json`, '{}');
+		savedTimeJson = fs.readFileSync(`${__dirname}/../../${file.dir}/${file.name}.json`, 'utf8');
 	}
 
 	global.json = checkJson(savedTimeJson);
@@ -142,7 +164,7 @@ function initiateCounting() {
 		global.json[global.currentTime()[0]][global.currentTime()[1]][global.currentTime()[2]].active++;
 		if (global.json[global.currentTime()[0]][global.currentTime()[1]][global.currentTime()[2]].active % 60 == 0) {
 			updateBarItem();
-			fs.writeFileSync(`${__dirname}/../${global.fileDir}/${global.fileName}.json`, JSON.stringify(global.json));
+			fs.writeFileSync(`${__dirname}/../../${file.dir}/${file.name}.json`, JSON.stringify(global.json));
 		}
 	}, 1000)
 }
@@ -190,7 +212,7 @@ function checkJson(json) {
 	}
 
 	if (hasChanged) {
-		fs.writeFileSync(`${__dirname}/../${global.fileDir}/${global.fileName}.json`, JSON.stringify(checkedJson), null, 4);
+		fs.writeFileSync(`${__dirname}/../../${file.dir}/${file.name}.json`, JSON.stringify(checkedJson), null, 4);
 	}
 
 	return checkedJson;
@@ -227,16 +249,32 @@ function defineCurrentSettings() {
 			global.labelPriority = Infinity;
 		}
 	}
+
+	if (vscode.workspace.getConfiguration().get('mimjas-time-tracker.timeTillIdle') >= 1 || vscode.workspace.getConfiguration().get('mimjas-time-tracker.timeTillIdle') <= 60) {
+		global.timeTillIdle = vscode.workspace.getConfiguration().get('mimjas-time-tracker.timeTillIdle') * 60 * 1000;
+	}
 }
 
-function unIdle(event) {
-	if (global.isIdle) global.isIdle = false;
-	if (!event.focused) return;
+/**
+ * This function that handles the idle timer.
+ */
+function unIdle(e) {
+	if (global.isIdle) {
+		global.isIdle = false;
+		updateBarItem();
+	}
 
 	clearTimeout(global.idleTimeout);
 	global.idleTimeout = setTimeout(() => {
 		global.isIdle = true;
-		vscode.window.showInformationMessage('Idle mode has been activated. Time will not be logged until you resume coding.');
+
+		vscode.window.showInformationMessage('Idle mode has been activated. If this idle timer is too short, you can change it in the settings.', 'Change Settings').then((s) => {
+			if (s == 'Change Settings') {
+				vscode.commands.executeCommand('workbench.action.openSettings', 'mimjas-time-tracker');
+			}
+		});
+
+		global.item.text = `${global.iconString} Idle`;
 	}, global.timeTillIdle);
 }
 
@@ -261,13 +299,26 @@ function showCat() {
 		<title>Cat Coding - Image</title>
 	</head>
 	<body>
-		<img src="https://media.giphy.com/media/JIX9t2j0ZTN9S/giphy.gif" width="650" />
+		<img src="https://media.giphy.com/media/JIX9t2j0ZTN9S/giphy.gif" width="700" />
 	</body>
 	</html>`;
 }
 
+/**
+ * This will remove the current counting badge and re-make it.
+ * Basically updating the item.
+ * @param {context} context 
+ */
+function initiateCountingBadge(context) {
+	if (global.item != null) global.item.dispose();
+	global.item = vscode.window.createStatusBarItem(global.labelPosition, global.labelPriority);
+	global.item.command = 'mimjas-time-tracker.timeStatuesItemClicked';
+	context.subscriptions.push(global.item);
+	global.item.show();
+}
+
 function deactivate() {
-	fs.writeFileSync(`${__dirname}/../${global.fileDir}/${global.fileName}.json`, JSON.stringify(global.json));
+	fs.writeFileSync(`${__dirname}/../../${file.dir}/${file.name}.json`, JSON.stringify(global.json));
 }
 
 module.exports = {

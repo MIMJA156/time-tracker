@@ -3,7 +3,7 @@
   "name": "time-tracker-app",
   "displayName": "Mimjas Time Tracker",
   "description": "Logs the amount of time you spend coding.",
-  "version": "1.0.1",
+  "version": "2.5.1",
   "publisher": "MIMJA156",
   "repository": {
     "type": "git",
@@ -12,13 +12,20 @@
   "engines": {
     "vscode": "^1.63.0"
   },
+  "scripts": {
+    "build": "npm run esbuild-base -- --minify",
+    "esbuild-base": "esbuild ./src/extension.js --bundle --outfile=out/main.js --external:vscode --format=cjs --platform=node",
+    "esbuild": "npm run esbuild-base -- --sourcemap",
+    "watch": "npm run esbuild-base -- --sourcemap --watch",
+    "test-compile": "tsc -p ./"
+  },
   "categories": [
     "Other"
   ],
   "activationEvents": [
     "onStartupFinished"
   ],
-  "main": "./extension.js",
+  "main": "./out/main.js",
   "capabilities": {
     "untrustedWorkspaces": {
       "supported": true
@@ -26,17 +33,23 @@
   },
   "contributes": {
     "commands": [{
-      "command": "mimjas-time-tracker.showCat",
-      "title": "Show the Fabled Cat GIF"
-    }],
+        "command": "mimjas-time-tracker.showCat",
+        "title": "Show the Fabled Cat GIF",
+        "category": "Time Tracker"
+      },
+      {
+        "command": "mimjas-time-tracker.showOnWeb",
+        "title": "Show Time on the Web",
+        "category": "Time Tracker"
+      }
+    ],
     "configuration": [{
       "title": "Mimjas Time Tracker",
       "properties": {
         "mimjas-time-tracker.iconStyle": {
           "type": "string",
           "default": "circuit-board",
-          "description": "Type in the default codicon ID for the icon you want.\nList of icons -> https://code.visualstudio.com/api/references/icons-in-labels#icon-listing",
-          "scope": "application"
+          "description": "Type in the default codicon ID for the icon you want.\nList of icons -> https://code.visualstudio.com/api/references/icons-in-labels#icon-listing"
         },
         "mimjas-time-tracker.labelPosition": {
           "type": "string",
@@ -50,11 +63,19 @@
         "mimjas-time-tracker.labelPriority": {
           "type": "boolean",
           "description": "Will be more towards the center of the statues bar when on."
+        },
+        "mimjas-time-tracker.timeTillIdle": {
+          "type": "number",
+          "default": "5",
+          "minimum": 1,
+          "maximum": 60,
+          "description": "The amount of time in minutes before the time tracker will idle."
         }
       }
     }]
   },
   "devDependencies": {
+    "esbuild": "^0.14.23",
     "eslint": "^8.6.0"
   },
   "dependencies": {

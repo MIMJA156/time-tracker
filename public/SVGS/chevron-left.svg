@@ -1,12 +1,12 @@
-<svg
-  width="24"
+<?xml version="1.0" encoding="utf-8"?>
+<svg width="24"
   height="24"
-  viewBox="0 0 24 24"
+  viewBox="0 0 13.8 23"
   fill="none"
   xmlns="http://www.w3.org/2000/svg"
->
-  <path
-    d="M16.2426 6.34317L14.8284 4.92896L7.75739 12L14.8285 19.0711L16.2427 17.6569L10.5858 12L16.2426 6.34317Z"
+  xmlns:bx="https://boxy-svg.com">
+
+  <path d="M 13.774 2.299 L 11.478 0 L 0 11.5 L 11.478 23 L 13.774 20.7 L 4.591 11.5 L 13.774 2.299 Z"
     fill="currentColor"
-  />
+    bx:origin="0 0" />
 </svg>
