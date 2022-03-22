@@ -7,6 +7,7 @@ const {
 } = require('../config.json');
 
 let running = false;
+let isIdle = false;
 
 module.exports = () => {
     if (!running) bootServer();
@@ -25,14 +26,13 @@ function bootServer() {
 
     app.get('/api', (req, res) => {
         res.send(JSON.parse(fs.readFileSync(`${__dirname}/../../${file.dir}/settings.json`)));
-        // pingIdle()
     });
 
     app.post('/api/update-settings', (req, res) => {
         let settings = JSON.parse(fs.readFileSync(`${__dirname}/../../${file.dir}/settings.json`));
         settings.web.graph.type = req.body.graphType;
+        settings.web.graph.colors = req.body.colors;
         fs.writeFileSync(`${__dirname}/../../${file.dir}/settings.json`, JSON.stringify(settings));
-        // pingIdle()
     });
 
     app.get('/api/initial-data', async (req, res) => {
@@ -105,8 +105,9 @@ function bootServer() {
             }
         }
 
+        idle();
+
         res.send(graphDataChanged);
-        // pingIdle()
     });
 
     app.get('/api/update-data', async (req, res) => {
@@ -145,7 +146,7 @@ function bootServer() {
 
         newData.time = newData.time.reverse();
 
-        // pingIdle();
+        idle();
 
         res.send(newData);
     });
@@ -157,13 +158,13 @@ function bootServer() {
 
     let timeout;
 
-    // function pingIdle() {
-    //     clearTimeout(timeout);
-    //     timeout = setTimeout(() => {
-    //         a.close();
-    //         running = false;
-    //     }, 1 * 60 * 1000);
-    // }
+    function idle() {
+        clearTimeout(timeout);
+        timeout = setTimeout(() => {
+            a.close();
+            running = false;
+        }, 60000);
+    }
 }
 
 //Useful functions.

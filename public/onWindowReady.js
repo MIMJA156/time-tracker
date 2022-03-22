@@ -93,6 +93,71 @@ function windowIsReady() {
             $('#reset-settings-pos').css('display', 'none');
             shown = false;
         });
+
+        $('#sunday-color-selector').val(colors[0]);
+        $('#monday-color-selector').val(colors[1]);
+        $('#tuesday-color-selector').val(colors[2]);
+        $('#wednesday-color-selector').val(colors[3]);
+        $('#thursday-color-selector').val(colors[4]);
+        $('#friday-color-selector').val(colors[5]);
+        $('#saturday-color-selector').val(colors[6]);
+
+        $('#reset-color-selectors').on('click', () => {
+            colors = ["#FF6384", "#FF9F40", "#FFCD56", "#4BC0C0", "#36A2EB", "#9966FF", "#C9CBCF"];
+            $('#sunday-color-selector').val(colors[0]);
+            $('#monday-color-selector').val(colors[1]);
+            $('#tuesday-color-selector').val(colors[2]);
+            $('#wednesday-color-selector').val(colors[3]);
+            $('#thursday-color-selector').val(colors[4]);
+            $('#friday-color-selector').val(colors[5]);
+            $('#saturday-color-selector').val(colors[6]);
+            updateChart();
+            updateSettings();
+        })
+
+        $('#sunday-color-selector').on('change', () => {
+            colors[0] = $('#sunday-color-selector').val();
+            updateChart();
+            updateSettings();
+        })
+
+        $('#monday-color-selector').on('change', () => {
+            colors[1] = $('#monday-color-selector').val();
+            updateChart();
+            updateSettings();
+        })
+
+        $('#tuesday-color-selector').on('change', () => {
+            colors[2] = $('#tuesday-color-selector').val();
+            updateChart();
+            updateSettings();
+        })
+
+        $('#wednesday-color-selector').on('change', () => {
+            colors[3] = $('#wednesday-color-selector').val();
+            updateChart();
+            updateSettings();
+        })
+
+        $('#thursday-color-selector').on('change', () => {
+            colors[4] = $('#thursday-color-selector').val();
+            updateChart();
+            updateSettings();
+        })
+
+        $('#friday-color-selector').on('change', () => {
+            console.log($('#friday-color-selector').val());
+            colors[5] = $('#friday-color-selector').val();
+            updateChart();
+            updateSettings();
+        })
+
+        $('#saturday-color-selector').on('change', () => {
+            colors[6] = $('#saturday-color-selector').val();
+            updateChart();
+            updateSettings();
+        })
+
     }
 }
 
@@ -102,7 +167,8 @@ function updateSettings() {
         method: 'POST',
         dataType: 'json',
         data: {
-            graphType: graphType
+            graphType: graphType,
+            colors: colors,
         }
     });
 }

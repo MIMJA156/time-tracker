@@ -96,6 +96,15 @@ function activate(context) {
 			"web": {
 				"graph": {
 					"type": "bar",
+					"colors": [
+						'#FF6384',
+						'#FF9F40',
+						'#FFCD56',
+						'#4BC0C0',
+						'#36A2EB',
+						'#9966FF',
+						'#C9CBCF'
+					]
 				}
 			}
 		}));

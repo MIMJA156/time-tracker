@@ -5,6 +5,7 @@ let timeObject;
 let elin = 0;
 let shadowElin = 0;
 let graphType = 'lol';
+let colors = ['lol'];
 
 //Real Code
 let count = 1;
@@ -19,6 +20,7 @@ $.ajax({
     method: 'GET',
     success: (settings) => {
         graphType = settings.web.graph.type;
+        colors = settings.web.graph.colors;
         setTimeout(() => {
             clearInterval(connectingInterval);
             $('#statues-img').attr('src', `./SVGS/succeeded.svg`);
@@ -177,6 +179,8 @@ function updateChart() {
             if (x < 1) x = 0;
             return x;
         });
+        chart.data.datasets[0].backgroundColor = colors.map(x => `${x}33`);
+        chart.data.datasets[0].borderColor = colors;
         chart.update();
     } else {
         try {
@@ -194,24 +198,8 @@ function updateChart() {
                             if (x < 1) x = 0;
                             return x;
                         }),
-                        backgroundColor: [
-                            'rgba(255, 99, 132, 0.2)',
-                            'rgba(255, 159, 64, 0.2)',
-                            'rgba(255, 205, 86, 0.2)',
-                            'rgba(75, 192, 192, 0.2)',
-                            'rgba(54, 162, 235, 0.2)',
-                            'rgba(153, 102, 255, 0.2)',
-                            'rgba(201, 203, 207, 0.2)'
-                        ],
-                        borderColor: [
-                            'rgb(255, 99, 132)',
-                            'rgb(255, 159, 64)',
-                            'rgb(255, 205, 86)',
-                            'rgb(75, 192, 192)',
-                            'rgb(54, 162, 235)',
-                            'rgb(153, 102, 255)',
-                            'rgb(201, 203, 207)'
-                        ],
+                        backgroundColor: colors.map(x => `${x}33`),
+                        borderColor: colors,
                         borderWidth: 1,
                         pointRadius: 10,
                         pointHoverRadius: 15,
@@ -247,7 +235,16 @@ function updateChart() {
                     },
                     scales: {
                         y: {
-                            beginAtZero: true
+                            beginAtZero: true,
+                            ticks: {
+                                autoSkip: false,
+                                maxTicksLimit: 10,
+                                stepSize: 30,
+                                callback: function (value, index, values) {
+                                    if (value % 60 === 0) return `${value / 60} hr`;
+                                    return `${((value / 60 - 0.5) === 0) ? "" : `${(value / 60 - 0.5)} hr`} ${value - Math.floor((value / 60)) * 60} min`;
+                                }
+                            }
                         }
                     }
                 }
