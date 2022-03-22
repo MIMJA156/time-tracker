@@ -46,6 +46,7 @@ $.ajax({
                                     success: (t) => {
                                         defineCurrentSanity(timeObject);
                                         $('#statues-text').text('Ready');
+                                        $('#statues-img').attr('src', `./SVGS/succeeded.svg`);
                                         timeObject[t.current].active = t.time;
                                         if (elin === 0) {
                                             updateChart();
