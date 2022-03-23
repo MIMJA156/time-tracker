@@ -241,9 +241,9 @@ function updateChart() {
                                 autoSkip: false,
                                 maxTicksLimit: 10,
                                 stepSize: 30,
-                                callback: function (value, index, values) {
+                                callback: function (value) {
                                     if (value % 60 === 0) return `${value / 60} hr`;
-                                    return `${((value / 60 - 0.5) === 0) ? "" : `${(value / 60 - 0.5)} hr`} ${value - Math.floor((value / 60)) * 60} min`;
+                                    return `${((value / 60 - 0.5) <= 0) ? "" : `${(value / 60 - 0.5)} hr`} ${value - Math.floor((value / 60)) * 60} min`;
                                 }
                             }
                         }

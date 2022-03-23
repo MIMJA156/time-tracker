@@ -174,7 +174,8 @@ body {
     font-size: large;
     padding: 10px;
     width: 100%;
-    overflow: scroll;
+    overflow-y: scroll;
+    overflow-x: hidden;
 }
 
 .settings-cell {
@@ -201,4 +202,16 @@ body {
 input[type=color] {
     border: none;
     cursor: pointer;
+}
+
+.color-selector-button {
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    border: 1px solid black;
+    padding: 3px;
+}
+
+.color-selector-button:hover {
+    background-color: lightblue;
 }

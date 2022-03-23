@@ -159,8 +159,10 @@ function bootServer() {
     let timeout;
 
     function idle() {
+        console.log('idle');
         clearTimeout(timeout);
         timeout = setTimeout(() => {
+            console.log('idle timeout');
             a.close();
             running = false;
         }, 60000);
