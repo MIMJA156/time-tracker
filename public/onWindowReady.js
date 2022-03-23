@@ -95,9 +95,6 @@ function windowIsReady() {
         });
     }
 
-    let shadowColors = [];
-    let toRevert = false;
-
     setColorItems(colors);
 
     $('#sunday-color-selector').on('change', () => {
