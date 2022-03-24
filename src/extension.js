@@ -171,8 +171,8 @@ function initiateCounting() {
 		if (global.isIdle) return;
 		global.json = checkJson(global.json);
 		global.json[global.currentTime()[0]][global.currentTime()[1]][global.currentTime()[2]].active++;
+		updateBarItem();
 		if (global.json[global.currentTime()[0]][global.currentTime()[1]][global.currentTime()[2]].active % 60 == 0) {
-			updateBarItem();
 			fs.writeFileSync(`${__dirname}/../../${file.dir}/${file.name}.json`, JSON.stringify(global.json));
 		}
 	}, 1000)
