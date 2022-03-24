@@ -306,7 +306,7 @@ function defineCurrentSanity(hoursInTotal) {
     let sanity = maxSanity;
     let totalTime = hoursInTotal[hoursInTotal.current].active.reduce((partialSum, a) => partialSum + a, 0);
 
-    sanity = sanity - Math.floor((totalTime / 60) / 30);
+    sanity = sanity - Math.floor((totalTime / 60) / 15);
 
     $('#sanity-percent').text(`${(sanity/maxSanity) * 100}`);
 }

@@ -1,4 +1,7 @@
 let shown = false;
+let a;
+let b;
+let defaultColors = ["#FF6384", "#FF9F40", "#FFCD56", "#4BC0C0", "#36A2EB", "#9966FF", "#C9CBCF"];
 
 function windowIsReady() {
     console.log('Window is ready.');
@@ -95,56 +98,109 @@ function windowIsReady() {
         });
     }
 
+    a = [...colors];
+
     setColorItems(colors);
+    colorChanged();
 
     $('#sunday-color-selector').on('change', () => {
         colors[0] = $('#sunday-color-selector').val();
         updateChart();
-        updateSettings();
+        colorChanged();
     })
 
     $('#monday-color-selector').on('change', () => {
         colors[1] = $('#monday-color-selector').val();
         updateChart();
-        updateSettings();
+        colorChanged();
     })
 
     $('#tuesday-color-selector').on('change', () => {
         colors[2] = $('#tuesday-color-selector').val();
         updateChart();
-        updateSettings();
+        colorChanged();
     })
 
     $('#wednesday-color-selector').on('change', () => {
         colors[3] = $('#wednesday-color-selector').val();
         updateChart();
-        updateSettings();
+        colorChanged();
     })
 
     $('#thursday-color-selector').on('change', () => {
         colors[4] = $('#thursday-color-selector').val();
         updateChart();
-        updateSettings();
+        colorChanged();
     })
 
     $('#friday-color-selector').on('change', () => {
-        console.log($('#friday-color-selector').val());
         colors[5] = $('#friday-color-selector').val();
         updateChart();
-        updateSettings();
+        colorChanged();
     })
 
     $('#saturday-color-selector').on('change', () => {
         colors[6] = $('#saturday-color-selector').val();
         updateChart();
-        updateSettings();
+        colorChanged();
     })
+
+    $('#color-selector-save').on('click', () => {
+        if (!$('#color-selector-save').hasClass('crossed-out')) {
+            console.log('Saving colors.');
+            updateSettings();
+            colorChanged();
+            a = [...colors];
+            $('#color-selector-save').addClass('crossed-out');
+            $('#color-selector-revert').addClass('crossed-out');
+        }
+    })
+
+    $('#color-selector-revert').on('click', () => {
+        if (!$('#color-selector-revert').hasClass('crossed-out')) {
+            colors = [...a];
+            setColorItems(colors);
+            updateChart();
+            colorChanged();
+            $('#color-selector-revert').addClass('crossed-out');
+            $('#color-selector-save').addClass('crossed-out');
+        }
+    })
+
+    $('#color-selector-reset').on('click', () => {
+        if (!$('#color-selector-reset').hasClass('crossed-out')) {
+            colors = [...defaultColors];
+            setColorItems(colors);
+            updateChart();
+            colorChanged();
+
+            if (colors.equals(a)) {
+                $('#color-selector-save').addClass('crossed-out');
+                $('#color-selector-revert').addClass('crossed-out');
+            }
+        }
+    })
+}
+
+function colorChanged() {
+    if (!colors.equals(a)) {
+        $('#color-selector-save').removeClass('crossed-out');
+    }
+
+    if (!colors.equals(a)) {
+        $('#color-selector-revert').removeClass('crossed-out');
+    }
+
+    if (colors.equals(defaultColors)) {
+        $('#color-selector-reset').addClass('crossed-out');
+    } else {
+        $('#color-selector-reset').removeClass('crossed-out');
+    }
 }
 
 function updateSettings() {
     $.ajax({
-        url: `
-                http: //localhost:${document.location.port}/api/update-settings`,
+        url: `http://localhost:${document.location.port}/api/update-settings`,
         method: 'POST',
         dataType: 'json',
         data: {
@@ -162,4 +218,8 @@ function setColorItems(c) {
     $('#thursday-color-selector').val(c[4]);
     $('#friday-color-selector').val(c[5]);
     $('#saturday-color-selector').val(c[6]);
+}
+
+Array.prototype.equals = function (a2) {
+    return this.every((v, i) => v === a2[i]);
 }
