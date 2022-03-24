@@ -108,3 +108,6 @@ All Changes made are logged in this file.
 - added the ability to change the graph colors
 - added a sanity counter for the weeks
 - most likely removed a bug
+
+###### 2.9.1
+- removed a web settings bug and a sanity bug

@@ -88,27 +88,10 @@ function activate(context) {
 	const showGraphCommand = 'mimjas-time-tracker.showOnWeb';
 
 	context.subscriptions.push(vscode.commands.registerCommand(showCatCommand, showCat));
-	context.subscriptions.push(vscode.commands.registerCommand(showGraphCommand, showOnWeb));
+	context.subscriptions.push(vscode.commands.registerCommand(showGraphCommand, showOnWeb))
 
-	// Create the settings json file if it does not exist.
-	if (!fs.existsSync(`${__dirname}/../../${file.dir}/settings.json`)) {
-		fs.writeFileSync(`${__dirname}/../../${file.dir}/settings.json`, JSON.stringify({
-			"web": {
-				"graph": {
-					"type": "bar",
-					"colors": [
-						'#FF6384',
-						'#FF9F40',
-						'#FFCD56',
-						'#4BC0C0',
-						'#36A2EB',
-						'#9966FF',
-						'#C9CBCF'
-					]
-				}
-			}
-		}));
-	}
+	//Run checks on the web settings.
+	checkWebSettings();
 }
 
 async function showOnWeb() {
@@ -328,6 +311,50 @@ function initiateCountingBadge(context) {
 
 function deactivate() {
 	fs.writeFileSync(`${__dirname}/../../${file.dir}/${file.name}.json`, JSON.stringify(global.json));
+}
+
+/**
+ * This function will check if the settings exist and if not, it will create them.
+ */
+function checkWebSettings() {
+	if (!fs.existsSync(`${__dirname}/../../${file.dir}/settings.json`)) {
+		fs.writeFileSync(`${__dirname}/../../${file.dir}/settings.json`, JSON.stringify({
+			"web": {
+				"graph": {
+					"type": "bar",
+					"colors": [
+						'#FF6384',
+						'#FF9F40',
+						'#FFCD56',
+						'#4BC0C0',
+						'#36A2EB',
+						'#9966FF',
+						'#C9CBCF'
+					]
+				}
+			}
+		}));
+	}
+
+	let currentWebSettings = JSON.parse(fs.readFileSync(`${__dirname}/../../${file.dir}/settings.json`, 'utf-8'));
+
+	if (!currentWebSettings.web.graph.type) {
+		currentWebSettings.web.graph.type = 'bar';
+	}
+
+	if (!currentWebSettings.web.graph.colors) {
+		currentWebSettings.web.graph.colors = [
+			'#FF6384',
+			'#FF9F40',
+			'#FFCD56',
+			'#4BC0C0',
+			'#36A2EB',
+			'#9966FF',
+			'#C9CBCF'
+		];
+	}
+
+	fs.writeFileSync(`${__dirname}/../../${file.dir}/settings.json`, JSON.stringify(currentWebSettings));
 }
 
 module.exports = {
