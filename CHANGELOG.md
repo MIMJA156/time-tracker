@@ -103,3 +103,8 @@ All Changes made are logged in this file.
 
 ###### 2.5.1
 - removed broken code
+
+###### 2.9.0
+- added the ability to change the graph colors
+- added a sanity counter for the weeks
+- most likely removed a bug
