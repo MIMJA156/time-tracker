@@ -117,3 +117,6 @@ All Changes made are logged in this file.
 
 ###### 2.9.3
 - added a few small quality off life changes :)
+
+###### 2.9.4
+- new css and a new font
