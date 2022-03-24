@@ -111,3 +111,6 @@ All Changes made are logged in this file.
 
 ###### 2.9.1
 - removed a web settings bug and a sanity bug
+
+###### 2.9.2
+- actually fixed the sanity bug from 2.9.1

@@ -308,5 +308,5 @@ function defineCurrentSanity(hoursInTotal) {
 
     sanity = sanity - Math.floor((totalTime / 60) / 15);
 
-    $('#sanity-percent').text(`${(Math.floor(sanity/maxSanity)) * 100}`);
+    $('#sanity-percent').text(`${Math.floor((sanity/maxSanity) * 100)}`);
 }
