@@ -208,6 +208,9 @@ function updateChart() {
                 },
                 options: {
                     plugins: {
+                        legend: {
+                            display: false
+                        },
                         tooltip: {
                             callbacks: {
                                 label: function (context) {
@@ -228,8 +231,13 @@ function updateChart() {
                                         h_s = ' No Time Spent';
                                         m_s = '';
                                     }
+                                    let maxSanity = 100;
+                                    let sanity = maxSanity;
+                                    let totalTime = timeObject[timeObject.current].active[context.dataIndex];
 
-                                    return `${h_s} ${m_s}`;
+                                    sanity = sanity - Math.floor((totalTime / 60) / 15);
+
+                                    return [`${h_s} ${m_s}`, `Sanity ${sanity}%`];
                                 }
                             }
                         }

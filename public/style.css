@@ -92,6 +92,7 @@ body {
 
 .crossed-out {
     text-decoration: line-through;
+    color: grey;
 }
 
 #open-settings,
