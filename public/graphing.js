@@ -89,7 +89,14 @@ $('.r').on('click', () => {
     defineCurrentSanity(timeObject);
 });
 
+/**
+ * This function moves the chart to the left or to the right.
+ * @param {string} pos can be either 'L' or 'R'
+ * @param {boolean} more decides if the chart is actually moved or not.
+ */
 function move(pos, more) {
+    pos = pos.toLowerCase();
+
     let current = timeObject.current.split('/')[0].split('-').concat(timeObject.current.split('/')[1].split('-')).map(x => parseInt(x));
 
     if (pos === 'r') {
