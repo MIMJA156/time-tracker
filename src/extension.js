@@ -156,6 +156,8 @@ function initiateCounting() {
 		global.json = checkJson(global.json);
 		global.json[global.currentTime()[0]][global.currentTime()[1]][global.currentTime()[2]].active++;
 
+		console.log(global.currentLanguage);
+
 		if (global.currentLanguage !== 'null') {
 			if (global.json[global.currentTime()[0]][global.currentTime()[1]][global.currentTime()[2]].languages[global.currentLanguage] == undefined) {
 				global.json[global.currentTime()[0]][global.currentTime()[1]][global.currentTime()[2]].languages[global.currentLanguage] = 0;
@@ -265,10 +267,18 @@ function defineCurrentSettings() {
 /**
  * This function that handles the idle timer.
  */
-function unIdle(e) {
+function unIdle(event) {
 	try {
-		global.currentLanguage = e.document.languageId;
-	} catch (e) {}
+		console.log(event.isClosed, 'closed');
+	} catch (e) {
+		console.log(e);
+	}
+
+	try {
+		global.currentLanguage = event.document.languageId;
+	} catch (e) {
+		global.currentLanguage = 'null';
+	}
 
 	if (global.isIdle) {
 		global.isIdle = false;
