@@ -47,7 +47,23 @@ $.ajax({
                                         defineCurrentSanity(timeObject);
                                         $('#statues-text').text('Ready');
                                         $('#statues-img').attr('src', `./svgs/succeeded.svg`);
-                                        timeObject[t.current].active = t.time;
+
+                                        try {
+                                            timeObject[t.current].active = t.time;
+                                        } catch (e) {
+                                            $.ajax({
+                                                url: `http://localhost:${document.location.port}/api/initial-data`,
+                                                method: 'GET',
+                                                success: (t) => {
+                                                    timeObject = t;
+                                                    updateChart();
+                                                    defineCurrentSanity(timeObject);
+                                                    move('r', false);
+                                                    move('l', false);
+                                                }
+                                            });
+                                        }
+
                                         if (elin === 0) {
                                             updateChart();
                                             move('r', false);
@@ -214,6 +230,7 @@ function updateChart() {
                     }]
                 },
                 options: {
+                    maintainAspectRatio: false,
                     onClick: (e) => {
                         let points = chart.getElementsAtEventForMode(e, 'nearest', {
                             intersect: true
