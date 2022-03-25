@@ -15,6 +15,7 @@ global.minutesInADay = 1440;
 global.timeTillIdle = 5 * 60 * 1000;
 global.idleTimeout = null;
 global.item = null;
+global.currentLanguage = 'null';
 
 /**
  * This functions returns an array containing information about the current local time.
@@ -154,6 +155,15 @@ function initiateCounting() {
 		if (global.isIdle) return;
 		global.json = checkJson(global.json);
 		global.json[global.currentTime()[0]][global.currentTime()[1]][global.currentTime()[2]].active++;
+
+		if (global.currentLanguage !== 'null') {
+			if (global.json[global.currentTime()[0]][global.currentTime()[1]][global.currentTime()[2]].languages[global.currentLanguage] == undefined) {
+				global.json[global.currentTime()[0]][global.currentTime()[1]][global.currentTime()[2]].languages[global.currentLanguage] = 0;
+			} else {
+				global.json[global.currentTime()[0]][global.currentTime()[1]][global.currentTime()[2]].languages[global.currentLanguage]++;
+			}
+		}
+
 		updateBarItem();
 		if (global.json[global.currentTime()[0]][global.currentTime()[1]][global.currentTime()[2]].active % 60 == 0) {
 			fs.writeFileSync(`${__dirname}/../../${file.dir}/${file.name}.json`, JSON.stringify(global.json));
@@ -200,6 +210,11 @@ function checkJson(json) {
 	if (previous.day == undefined) {
 		let dayKey = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
 		checkedJson[global.currentTime()[0]][global.currentTime()[1]][global.currentTime()[2]].day = dayKey[global.currentTime()[6].getDay()];
+		hasChanged = true;
+	}
+
+	if (previous.languages == undefined) {
+		checkedJson[global.currentTime()[0]][global.currentTime()[1]][global.currentTime()[2]].languages = {};
 		hasChanged = true;
 	}
 
@@ -251,6 +266,10 @@ function defineCurrentSettings() {
  * This function that handles the idle timer.
  */
 function unIdle(e) {
+	try {
+		global.currentLanguage = e.document.languageId;
+	} catch (e) {}
+
 	if (global.isIdle) {
 		global.isIdle = false;
 		updateBarItem();

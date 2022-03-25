@@ -12,7 +12,7 @@ let count = 1;
 let connectingInterval = setInterval(() => {
     count++;
     if (count > 3) count = 1;
-    $('#statues-img').attr('src', `./SVGS/connecting-${count}.svg`);
+    $('#statues-img').attr('src', `./svgs/connecting-${count}.svg`);
 }, 500);
 
 $.ajax({
@@ -23,8 +23,8 @@ $.ajax({
         colors = settings.web.graph.colors;
         setTimeout(() => {
             clearInterval(connectingInterval);
-            $('#statues-img').attr('src', `./SVGS/succeeded.svg`);
-            $('#statues-text').text('Connected, loading data...');
+            $('#statues-img').attr('src', `./svgs/succeeded.svg`);
+            $('#statues-text').text('Loading data...');
             setTimeout(() => {
                 $.ajax({
                     url: `http://localhost:${document.location.port}/api/initial-data`,
@@ -46,7 +46,7 @@ $.ajax({
                                     success: (t) => {
                                         defineCurrentSanity(timeObject);
                                         $('#statues-text').text('Ready');
-                                        $('#statues-img').attr('src', `./SVGS/succeeded.svg`);
+                                        $('#statues-img').attr('src', `./svgs/succeeded.svg`);
                                         timeObject[t.current].active = t.time;
                                         if (elin === 0) {
                                             updateChart();
@@ -214,6 +214,18 @@ function updateChart() {
                     }]
                 },
                 options: {
+                    onClick: (e) => {
+                        let points = chart.getElementsAtEventForMode(e, 'nearest', {
+                            intersect: true
+                        }, true);
+
+                        if (points.length) {
+                            let point = points[0];
+                            let label = chart.data.labels[point.index];
+                            let value = chart.data.datasets[point.datasetIndex].data[point.index];
+                            console.log(`${label}: ${value} minutes`);
+                        }
+                    },
                     plugins: {
                         legend: {
                             display: false
@@ -277,6 +289,10 @@ function updateChart() {
     }
 }
 
+
+/**
+ * Destroys the current instance of the chart safely.
+ */
 function destroyChart() {
     chart.destroy();
     chartMade = false;
@@ -287,8 +303,8 @@ function destroyChart() {
  */
 function postError(errMsg) {
     $('#loading-img').css('display', 'flex');
-    $('#statues-img').attr('src', `./SVGS/failed.svg`);
-    $('#loading-img-dis').attr('src', `./SVGS/failed.svg`);
+    $('#statues-img').attr('src', `./svgs/failed.svg`);
+    $('#loading-img-dis').attr('src', `./svgs/failed.svg`);
     $('#statues-text').text(errMsg);
     $('#current-date').text('Undefined');
     $(`.l`).addClass('crossed-out');

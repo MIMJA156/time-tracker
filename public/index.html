@@ -9,21 +9,22 @@
 
 <body>
     <div class="top-bar">
-        <button class="l button crossed-out"><img id="l-img" src="./SVGS/chevron-left.svg"><span>Back One
+        <button class="l button crossed-out"><img id="l-img" src="./svgs/chevron-left.svg"><span>Back One
                 Week</span></button>
-        <span id="current-date"><img src="./SVGS/three-dots.svg"></span>
+        <span id="current-date"><img src="./svgs/three-dots.svg"></span>
         <button class="r button crossed-out"><span>Forward One Week</span><img id="r-img"
-                src="./SVGS/chevron-right.svg"></button>
+                src="./svgs/chevron-right.svg"></button>
     </div>
     <canvas id="chart"></canvas>
     <dic id="loading-img">
-        <img id="loading-img-dis" src="./SVGS/loading.svg">
+        <img id="loading-img-dis" src="./svgs/loading.svg">
     </dic>
     <div class="bottom-bar">
         <button id="reset-settings-pos">Reset Settings Position</button>
-        <button id="open-settings"><img src="./SVGS/gear.svg"></button>
+        <button id="open-settings"><img src="./svgs/gear.svg"></button>
+        <button id="open-advanced-view"><img src="./svgs/browse.svg"></button>
         <div id="connection-statues-container">
-            <img id="statues-img" src="./SVGS/connecting-1.svg">
+            <img id="statues-img" src="./svgs/connecting-1.svg">
             <span id="statues-text">Connecting...</span>
         </div>
         <span id="sanity-container">Sanity this Week:<span id="sanity-percent">100</span>%</span>
@@ -32,7 +33,7 @@
     <div id="settings-menu-body">
         <div id="settings-header">
             <span>Settings</span>
-            <button id="close-settings"><img src="./SVGS/failed.svg"></button>
+            <button id="close-settings"><img src="./svgs/failed.svg"></button>
         </div>
         <div id="settings-body">
             <div class="settings-cell">
@@ -86,7 +87,7 @@
         </div>
     </div>
 </body>
-<script src="./graphing.js"></script>
-<script src="./onWindowReady.js"></script>
+<script src="./js/graphing.js"></script>
+<script src="./js/onWindowReady.js"></script>
 
 </html>

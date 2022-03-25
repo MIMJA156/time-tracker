@@ -1,8 +1,3 @@
-* {
-    font-family: 'Courier New',
-        monospace;
-}
-
 body {
     padding: 0;
     margin: 0;
@@ -102,7 +97,8 @@ body {
 }
 
 #open-settings,
-#reset-settings-pos {
+#reset-settings-pos,
+#open-advanced-view {
     float: left;
     height: 100%;
     width: 50px;
