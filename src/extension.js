@@ -156,8 +156,6 @@ function initiateCounting() {
 		global.json = checkJson(global.json);
 		global.json[global.currentTime()[0]][global.currentTime()[1]][global.currentTime()[2]].active++;
 
-		console.log(global.currentLanguage);
-
 		if (global.currentLanguage !== 'null') {
 			if (global.json[global.currentTime()[0]][global.currentTime()[1]][global.currentTime()[2]].languages[global.currentLanguage] == undefined) {
 				global.json[global.currentTime()[0]][global.currentTime()[1]][global.currentTime()[2]].languages[global.currentLanguage] = 0;
@@ -269,12 +267,6 @@ function defineCurrentSettings() {
  */
 function unIdle(event) {
 	try {
-		console.log(event.isClosed, 'closed');
-	} catch (e) {
-		console.log(e);
-	}
-
-	try {
 		global.currentLanguage = event.document.languageId;
 	} catch (e) {
 		global.currentLanguage = 'null';
@@ -349,6 +341,7 @@ function checkWebSettings() {
 	if (!fs.existsSync(`${__dirname}/../../${file.dir}/settings.json`)) {
 		fs.writeFileSync(`${__dirname}/../../${file.dir}/settings.json`, JSON.stringify({
 			"web": {
+				"font": "none",
 				"graph": {
 					"type": "bar",
 					"colors": [
@@ -381,6 +374,10 @@ function checkWebSettings() {
 			'#9966FF',
 			'#C9CBCF'
 		];
+	}
+
+	if (!currentWebSettings.web.font) {
+		currentWebSettings.web.font = 'none';
 	}
 
 	fs.writeFileSync(`${__dirname}/../../${file.dir}/settings.json`, JSON.stringify(currentWebSettings));

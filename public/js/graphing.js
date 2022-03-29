@@ -6,6 +6,7 @@ let elin = 0;
 let shadowElin = 0;
 let graphType = 'lol';
 let colors = ['lol'];
+let fontFamily = 'lol';
 
 //Real Code
 let count = 1;
@@ -21,6 +22,7 @@ $.ajax({
     success: (settings) => {
         graphType = settings.web.graph.type;
         colors = settings.web.graph.colors;
+        fontFamily = settings.web.font;
         setTimeout(() => {
             clearInterval(connectingInterval);
             $('#statues-img').attr('src', `./svgs/succeeded.svg`);
@@ -47,6 +49,7 @@ $.ajax({
                                         defineCurrentSanity(timeObject);
                                         $('#statues-text').text('Ready');
                                         $('#statues-img').attr('src', `./svgs/succeeded.svg`);
+                                        enableWindow();
 
                                         try {
                                             timeObject[t.current].active = t.time;
@@ -73,6 +76,7 @@ $.ajax({
                                     error: () => {
                                         postError('Server Error while Updating.');
                                         destroyChart();
+                                        disableWindow();
                                     }
                                 })
                             }, getRandomTimeout());
@@ -297,6 +301,7 @@ function updateChart() {
 
             chartMade = true;
             $('#loading-img').css('display', 'none');
+            $('#chart-container').css('display', 'block');
             $('#statues-text').text('Ready');
             $('#current-date').text(timeObject.current);
         } catch (err) {
@@ -320,6 +325,7 @@ function destroyChart() {
  */
 function postError(errMsg) {
     $('#loading-img').css('display', 'flex');
+    $('#chart-container').css('display', 'none');
     $('#statues-img').attr('src', `./svgs/failed.svg`);
     $('#loading-img-dis').attr('src', `./svgs/failed.svg`);
     $('#statues-text').text(errMsg);

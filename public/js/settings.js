@@ -143,7 +143,6 @@ function bootSettingsWindow() {
 
     $('#color-selector-save').on('click', () => {
         if (!$('#color-selector-save').hasClass('crossed-out')) {
-            console.log('Saving colors.');
             updateSettings();
             colorChanged();
             a = [...colors];
@@ -176,6 +175,15 @@ function bootSettingsWindow() {
             }
         }
     })
+
+    $(`#font-family-selection option[value="${fontFamily}"]`).attr('selected', 'selected');
+    $('*').css('font-family', fontFamily);
+
+    $('#font-family-selection').on('change', () => {
+        fontFamily = $("#font-family-selection option:selected").val();
+        updateSettings();
+        $('*').css('font-family', fontFamily);
+    });
 }
 
 function colorChanged() {
@@ -202,6 +210,7 @@ function updateSettings() {
         data: {
             graphType: graphType,
             colors: colors,
+            fontFamily: fontFamily
         }
     });
 }

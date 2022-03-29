@@ -32,6 +32,7 @@ function bootServer() {
         let settings = JSON.parse(fs.readFileSync(`${__dirname}/../../${file.dir}/settings.json`));
         settings.web.graph.type = req.body.graphType;
         settings.web.graph.colors = req.body.colors;
+        settings.web.font = req.body.fontFamily;
         fs.writeFileSync(`${__dirname}/../../${file.dir}/settings.json`, JSON.stringify(settings));
     });
 
