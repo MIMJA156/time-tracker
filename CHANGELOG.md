@@ -120,3 +120,10 @@ All Changes made are logged in this file.
 
 ###### 2.9.4
 - new css and a new font
+
+## 3.0.0
+- added custom font choices
+- added movement keys
+- better CSS
+- improved backend
+- improved cat gif size
