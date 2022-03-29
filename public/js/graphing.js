@@ -6,6 +6,7 @@ let elin = 0;
 let shadowElin = 0;
 let graphType = 'lol';
 let colors = ['lol'];
+
 let fontFamily = 'lol';
 
 //Real Code
@@ -49,7 +50,6 @@ $.ajax({
                                         defineCurrentSanity(timeObject);
                                         $('#statues-text').text('Ready');
                                         $('#statues-img').attr('src', `./svgs/succeeded.svg`);
-                                        enableWindow();
 
                                         try {
                                             timeObject[t.current].active = t.time;
@@ -76,7 +76,6 @@ $.ajax({
                                     error: () => {
                                         postError('Server Error while Updating.');
                                         destroyChart();
-                                        disableWindow();
                                     }
                                 })
                             }, getRandomTimeout());

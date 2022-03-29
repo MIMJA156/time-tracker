@@ -142,36 +142,42 @@ function bootSettingsWindow() {
     })
 
     $('#color-selector-save').on('click', () => {
-        if (!$('#color-selector-save').hasClass('crossed-out')) {
-            updateSettings();
-            colorChanged();
-            a = [...colors];
-            $('#color-selector-save').addClass('crossed-out');
-            $('#color-selector-revert').addClass('crossed-out');
+        if (confirm("Are you sure to execute this action?")) {
+            if (!$('#color-selector-save').hasClass('crossed-out')) {
+                updateSettings();
+                colorChanged();
+                a = [...colors];
+                $('#color-selector-save').addClass('crossed-out');
+                $('#color-selector-revert').addClass('crossed-out');
+            }
         }
     })
 
     $('#color-selector-revert').on('click', () => {
         if (!$('#color-selector-revert').hasClass('crossed-out')) {
-            colors = [...a];
-            setColorItems(colors);
-            updateChart();
-            colorChanged();
-            $('#color-selector-revert').addClass('crossed-out');
-            $('#color-selector-save').addClass('crossed-out');
+            if (confirm("Are you sure to execute this action?")) {
+                colors = [...a];
+                setColorItems(colors);
+                updateChart();
+                colorChanged();
+                $('#color-selector-revert').addClass('crossed-out');
+                $('#color-selector-save').addClass('crossed-out');
+            }
         }
     })
 
     $('#color-selector-reset').on('click', () => {
         if (!$('#color-selector-reset').hasClass('crossed-out')) {
-            colors = [...defaultColors];
-            setColorItems(colors);
-            updateChart();
-            colorChanged();
+            if (confirm("Are you sure to execute this action?")) {
+                colors = [...defaultColors];
+                setColorItems(colors);
+                updateChart();
+                colorChanged();
 
-            if (colors.equals(a)) {
-                $('#color-selector-save').addClass('crossed-out');
-                $('#color-selector-revert').addClass('crossed-out');
+                if (colors.equals(a)) {
+                    $('#color-selector-save').addClass('crossed-out');
+                    $('#color-selector-revert').addClass('crossed-out');
+                }
             }
         }
     })
