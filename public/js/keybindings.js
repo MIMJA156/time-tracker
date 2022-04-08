@@ -7,5 +7,9 @@ function initializeKeyBindings() {
         if (e.key === 'ArrowLeft') {
             $('.l').trigger('click');
         }
+
+        if (e.key === 'ArrowUp') {
+            $('#open-settings').trigger('click');
+        }
     })
 }
