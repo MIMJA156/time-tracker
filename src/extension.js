@@ -18,17 +18,17 @@ global.item = null;
 global.currentLanguage = 'null';
 
 /**
- * This functions returns an array containing information about the current local time.
+ * This functions returns an array containing information about the current time.
  * @returns {[year, month, day, hour, minute, sec, today]}
  */
 global.currentTime = () => {
 	const today = new Date();
-	const yyyy = today.getFullYear();
-	const mm = today.getMonth() + 1;
-	const dd = today.getDate();
-	const hh = today.getHours();
-	const min = today.getMinutes();
-	const sec = today.getSeconds();
+	const yyyy = today.getUTCFullYear();
+	const mm = today.getUTCMonth() + 1;
+	const dd = today.getUTCDate();
+	const hh = today.getUTCHours();
+	const min = today.getUTCMinutes();
+	const sec = today.getUTCSeconds();
 	return [yyyy, mm, dd, hh, min, sec, today];
 }
 
@@ -36,6 +36,8 @@ global.currentTime = () => {
  * @param {vscode.ExtensionContext} context
  */
 function activate(context) {
+	console.log('Congratulations, your extension "mimjas-time-tracker" is now active!');
+
 	//Get the current settings
 	defineCurrentSettings();
 	cache.labelPosition = global.labelPosition;
@@ -109,6 +111,9 @@ async function showOnWeb() {
 	}
 }
 
+/**
+ * Update the bar item with the current time.
+ */
 function updateBarItem() {
 	let seconds = global.json[global.currentTime()[0]][global.currentTime()[1]][global.currentTime()[2]].active;
 
@@ -209,7 +214,7 @@ function checkJson(json) {
 
 	if (previous.day == undefined) {
 		let dayKey = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
-		checkedJson[global.currentTime()[0]][global.currentTime()[1]][global.currentTime()[2]].day = dayKey[global.currentTime()[6].getDay()];
+		checkedJson[global.currentTime()[0]][global.currentTime()[1]][global.currentTime()[2]].day = dayKey[global.currentTime()[2]];
 		hasChanged = true;
 	}
 
@@ -312,6 +317,7 @@ function showCat() {
 		<title>Cat Coding - Image</title>
 	</head>
 	<body>
+		CAT
 		<img src="https://media.giphy.com/media/JIX9t2j0ZTN9S/giphy.gif" width="800" />
 	</body>
 	</html>`;
