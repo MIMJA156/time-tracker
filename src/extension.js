@@ -317,7 +317,6 @@ function showCat() {
 		<title>Cat Coding - Image</title>
 	</head>
 	<body>
-		CAT
 		<img src="https://media.giphy.com/media/JIX9t2j0ZTN9S/giphy.gif" width="800" />
 	</body>
 	</html>`;
