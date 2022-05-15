@@ -214,7 +214,7 @@ function checkJson(json) {
 
 	if (previous.day == undefined) {
 		let dayKey = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
-		checkedJson[global.currentTime()[0]][global.currentTime()[1]][global.currentTime()[2]].day = dayKey[global.currentTime()[2]];
+		checkedJson[global.currentTime()[0]][global.currentTime()[1]][global.currentTime()[2]].day = dayKey[global.currentTime()[6].getUTCDay()];
 		hasChanged = true;
 	}
 
