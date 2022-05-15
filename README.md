@@ -2,7 +2,7 @@
 
 >NOTE: This is just a personal project. IT WILL NOT BE PERFECT!
 
->:warning:You may lose all your tracked time at any point! This is still in its beta phase!:warning:
+>:warning:You may lose all your tracked time at any point! This is still in it's beta phase!:warning:
 
 ## Features
 
