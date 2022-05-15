@@ -2,6 +2,8 @@
 
 >NOTE: This is just a personal project. IT WILL NOT BE PERFECT!
 
+>:warning:You may lose all your tracked time at any point! This is still in its beta phase!:warning:
+
 ## Features
 
 This simply will track the amount of time you spend coding per day in vscode.
