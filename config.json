@@ -1,6 +1,9 @@
 {
     "file": {
         "dir": "time-tracker-storage-mimja",
-        "name": "time.mim"
+        "name": "local-time.mim"
+    },
+    "server": {
+        "port": 8638
     }
 }
