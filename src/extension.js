@@ -1,10 +1,5 @@
 const vscode = require('vscode');
-const fs = require('fs');
 const open = require('open');
-
-const {
-    file
-} = require('../config.json');
 
 const global = {};
 const cache = {};
@@ -13,19 +8,15 @@ function activate() {
     setGlobal();
 }
 
-function deactivate() {
+function setGlobal() {
+    let storageTools = require('./tools/storage');
+    let localJson = storageTools.getLocalStoredTime();
+    let cloudJson = storageTools.getCloudStoredTime();
 
-}
-
-function getLocalStoredTime() {
-
-}
-
-function getCloudStoredTime() {
-
+    console.log(localJson);
+    console.log(cloudJson);
 }
 
 module.exports = {
-    activate,
-    deactivate
+    activate
 }
