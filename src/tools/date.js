@@ -10,7 +10,7 @@ function getCurrentTimeValues() {
         day: today.getDate(),
         hour: today.getHours(),
         minute: today.getMinutes(),
-        minute: today.getSeconds(),
+        second: today.getSeconds(),
         today: today
     };
 }

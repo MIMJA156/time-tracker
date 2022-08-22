@@ -21,6 +21,13 @@ function startTimer() {
 }
 
 /**
+ * Stops the timer loop
+ */
+function stopTimer() {
+    clearInterval(interval);
+}
+
+/**
  * Set's a function to be run every 1m of the timer
  * @param {Function} cb function that's run
  */
@@ -50,13 +57,6 @@ function setCallback1s(cb) {
  */
 function getTime() {
     return time;
-}
-
-/**
- * Stops the timer loop
- */
-function stopTimer() {
-    clearInterval(interval);
 }
 
 module.exports = {
