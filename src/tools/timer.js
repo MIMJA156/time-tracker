@@ -1,5 +1,6 @@
 const timeToIncreaseBy = 1000; // in milliseconds
 
+var interval = null;
 var time = 0;
 
 var callback1m = () => { };
@@ -9,8 +10,8 @@ var callback1s = () => { };
 /**
  * Boots the main timer loop
  */
-function bootTimer() {
-    setInterval(() => {
+function startTimer() {
+    interval = setInterval(() => {
         time += timeToIncreaseBy;
 
         if (time % (60 * 1000) == 0) callback1m(time);
@@ -51,8 +52,16 @@ function getTime() {
     return time;
 }
 
+/**
+ * Stops the timer loop
+ */
+function stopTimer() {
+    clearInterval(interval);
+}
+
 module.exports = {
-    bootTimer,
+    startTimer,
+    stopTimer,
     getTime,
     setCallback1m,
     setCallback30s,
