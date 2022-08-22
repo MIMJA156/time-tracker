@@ -16,7 +16,7 @@ function getCurrentTimeValues() {
 }
 
 /**
- * The current date in number format
+ * The current date in number format.
  * @returns {String}
  */
 function getCurrentDate() {

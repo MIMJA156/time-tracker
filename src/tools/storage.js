@@ -3,7 +3,7 @@ const { file } = require('../../config.json');
 const git = require("./auth");
 
 /**
- * Gets the locally stored time JSON
+ * Gets the locally stored time JSON.
  * @returns {JSON}
  */
 function getLocalStoredTime() {
@@ -26,7 +26,7 @@ function getLocalStoredTime() {
 }
 
 /**
- * Gets the cloud stored time JSON
+ * Gets the cloud stored time JSON.
  * @returns {JSON}
  */
 function getCloudStoredTime() {

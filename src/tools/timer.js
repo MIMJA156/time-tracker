@@ -8,7 +8,7 @@ var callback30s = () => { };
 var callback1s = () => { };
 
 /**
- * Boots the main timer loop
+ * Boots the main timer loop.
  */
 function startTimer() {
     interval = setInterval(() => {
@@ -21,39 +21,39 @@ function startTimer() {
 }
 
 /**
- * Stops the timer loop
+ * Stops the timer loop.
  */
 function stopTimer() {
     clearInterval(interval);
 }
 
 /**
- * Set's a function to be run every 1m of the timer
- * @param {Function} cb function that's run
+ * Set's a function to be run every 1m of the timer.
+ * @param {Function} cb function that's run.
  */
 function setCallback1m(cb) {
     callback1m = cb;
 }
 
 /**
- * Set's a function to be run every 30s of the timer
- * @param {Function} cb function that's run
+ * Set's a function to be run every 30s of the timer.
+ * @param {Function} cb function that's run.
  */
 function setCallback30s(cb) {
     callback30s = cb;
 }
 
 /**
- * Set's a function to be run every 1s of the timer
- * @param {Function} cb function that's run
+ * Set's a function to be run every 1s of the timer.
+ * @param {Function} cb function that's run.
  */
 function setCallback1s(cb) {
     callback1s = cb;
 }
 
 /**
- * Returns the currently cached time
- * @returns {Number} time in milliseconds
+ * Returns the currently cached time.
+ * @returns {Number} time in milliseconds.
  */
 function getTime() {
     return time;
