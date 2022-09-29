@@ -7,6 +7,8 @@
 This simply will track the amount of time you spend coding per day in vscode.
 Allows you to view the data in a user friendly way by clicking on the time tracking badge.
 
+# Install
+Go to the [Vscode Marketplace](https://marketplace.visualstudio.com/items?itemName=MIMJA156.time-tracker-app) and download the extension, thats it!
 
 ## Rework in progress
 
