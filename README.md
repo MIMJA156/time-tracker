@@ -1,2 +1,1 @@
-# Scrapped
-I decided to give up on the rework lol
+# Moved the rework to a [new repo](https://github.com/MIMJA156/time-tracker-ts-dev)
