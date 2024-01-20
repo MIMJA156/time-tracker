@@ -1,10 +1,8 @@
 const path = require("path");
-const port = 3217
+const port = 3217;
 const ex = require("express");
 const fs = require("fs");
-const {
-    file
-} = require('../config.json');
+const { file } = require("../config.json");
 
 let running = false;
 let isIdle = false;
@@ -18,17 +16,19 @@ function bootServer() {
     let app = ex();
 
     app.use(ex.json());
-    app.use(ex.urlencoded({
-        extended: true
-    }));
+    app.use(
+        ex.urlencoded({
+            extended: true,
+        })
+    );
 
     app.use(ex.static(path.join(__dirname, "../public/")));
 
-    app.get('/api', (req, res) => {
+    app.get("/api", (req, res) => {
         res.send(JSON.parse(fs.readFileSync(`${__dirname}/../../${file.dir}/settings.json`)));
     });
 
-    app.post('/api/update-settings', (req, res) => {
+    app.post("/api/update-settings", (req, res) => {
         let settings = JSON.parse(fs.readFileSync(`${__dirname}/../../${file.dir}/settings.json`));
         settings.web.graph.type = req.body.graphType;
         settings.web.graph.colors = req.body.colors;
@@ -36,8 +36,8 @@ function bootServer() {
         fs.writeFileSync(`${__dirname}/../../${file.dir}/settings.json`, JSON.stringify(settings));
     });
 
-    app.get('/api/initial-data', async (req, res) => {
-        const parsed = JSON.parse(fs.readFileSync(`${__dirname}/../../${file.dir}/${file.name}.json`, 'utf8'));
+    app.get("/api/initial-data", async (req, res) => {
+        const parsed = JSON.parse(fs.readFileSync(`${__dirname}/../../${file.dir}/${file.name}.json`, "utf8"));
 
         let graphDataChanged = {};
 
@@ -111,12 +111,12 @@ function bootServer() {
         res.send(graphDataChanged);
     });
 
-    app.get('/api/update-data', async (req, res) => {
-        const parsed = JSON.parse(fs.readFileSync(`${__dirname}/../../${file.dir}/${file.name}.json`, 'utf8'));
+    app.get("/api/update-data", async (req, res) => {
+        const parsed = JSON.parse(fs.readFileSync(`${__dirname}/../../${file.dir}/${file.name}.json`, "utf8"));
 
         let newData = {
-            current: '',
-            time: []
+            current: "",
+            time: [],
         };
 
         let currentRecordedYear = parseFloat(Object.keys(parsed)[Object.keys(parsed).length - 1]);
@@ -171,13 +171,13 @@ function bootServer() {
 //Useful functions.
 
 /**
- * @param {number} month 
- * @param {number} year 
+ * @param {number} month
+ * @param {number} year
  * @returns {number} The number of days in the month specified.
  */
 function getDaysInMonth(month, year) {
     return new Date(year, month, 0).getDate();
-};
+}
 
 /**
  * @param {number} val The number you want to check
@@ -190,8 +190,8 @@ async function loopTillValue(val, till, sign) {
     let depth = 10;
 
     let internalLoop = (val, till, sign, loops, resolve, reject) => {
-        if (loops > depth) reject('Too many loops.');
-        if (sign === '>') {
+        if (loops > depth) reject("Too many loops.");
+        if (sign === ">") {
             if (val >= till) {
                 resolve(loops);
             } else {
@@ -199,7 +199,7 @@ async function loopTillValue(val, till, sign) {
                 val++;
                 internalLoop(val, till, sign, loops, resolve, reject);
             }
-        } else if (sign === '<') {
+        } else if (sign === "<") {
             if (val <= till) {
                 resolve(loops);
             } else {
@@ -208,27 +208,27 @@ async function loopTillValue(val, till, sign) {
                 internalLoop(val, till, sign, loops, resolve, reject);
             }
         }
-    }
+    };
 
     let isDone = new Promise((resolve, reject) => {
         internalLoop(val, till, sign, loops, resolve, reject);
-    })
+    });
 
     return await isDone;
 }
 
 /**
  * This will let you know what week a certain date is in.
- * @param {number} day 
- * @param {number} month 
- * @param {number} year 
+ * @param {number} day
+ * @param {number} month
+ * @param {number} year
  * @returns {array} all the dates for the two dates that make up the week.
  */
 async function dateToWeek(day, month, year) {
     let dayIndex = new Date(`${year}/${month}/${day}`).getDay();
 
-    let tillWeekEnd = await loopTillValue(dayIndex, 6, '>');
-    let tillWeekStart = await loopTillValue(dayIndex, 0, '<');
+    let tillWeekEnd = await loopTillValue(dayIndex, 6, ">");
+    let tillWeekStart = await loopTillValue(dayIndex, 0, "<");
 
     let firstDay = day + tillWeekEnd;
     let secondDay = day - tillWeekStart;
